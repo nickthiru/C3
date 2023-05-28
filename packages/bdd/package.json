@@ -22,5 +22,8 @@
   },
   "bugs": {
     "url": "https://github.com/nickthiru/C3/issues"
+  },
+  "devDependencies": {
+    "jest-cucumber": "^3.0.1"
   }
 }
