@@ -1,0 +1,26 @@
+{
+  "name": "bdd",
+  "version": "0.0.0",
+  "description": "> TODO: description",
+  "author": "Nick Thiru <nickthiru@gmail.com>",
+  "homepage": "https://github.com/nickthiru/C3#readme",
+  "license": "ISC",
+  "main": "lib/bdd.js",
+  "directories": {
+    "lib": "lib",
+    "test": "__tests__"
+  },
+  "files": [
+    "lib"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nickthiru/C3.git"
+  },
+  "scripts": {
+    "test": "node ./__tests__/bdd.test.js"
+  },
+  "bugs": {
+    "url": "https://github.com/nickthiru/C3/issues"
+  }
+}
