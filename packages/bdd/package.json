@@ -18,7 +18,7 @@
     "url": "git+https://github.com/nickthiru/C3.git"
   },
   "scripts": {
-    "test": "node ./__tests__/bdd.test.js"
+    "test": "jest"
   },
   "bugs": {
     "url": "https://github.com/nickthiru/C3/issues"
