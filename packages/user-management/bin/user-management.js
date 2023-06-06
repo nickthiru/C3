@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 const cdk = require('aws-cdk-lib');
-const { UserManagementStack } = require('../lib/user-management-stack');
+const { UserManagementStack } = require('../lib/UserManagementStack');
 
 const app = new cdk.App();
 new UserManagementStack(app, 'UserManagementStack', {

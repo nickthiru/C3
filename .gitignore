@@ -132,5 +132,5 @@ dist
 # Lerna
 lerna-debug.log
 npm-debug.log
-packages/*/lib
+## packages/*/libs  # I don't know why I added this before I had to comment it out.
 .idea
