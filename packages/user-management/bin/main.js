@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 const cdk = require('aws-cdk-lib');
-const { MainStack } = require('../lib/MainStack');
+const { MainStack } = require('../lib/stacks/MainStack');
 
 const app = new cdk.App();
 new MainStack(app, 'MainStack', {
