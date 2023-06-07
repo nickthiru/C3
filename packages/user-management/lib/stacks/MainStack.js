@@ -1,7 +1,7 @@
 const { Stack, Duration } = require('aws-cdk-lib');
 // const sqs = require('aws-cdk-lib/aws-sqs');
 
-class UserManagementStack extends Stack {
+class MainStack extends Stack {
   /**
    *
    * @param {Construct} scope
@@ -20,4 +20,4 @@ class UserManagementStack extends Stack {
   }
 }
 
-module.exports = { UserManagementStack }
+module.exports = { MainStack }

@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 
 const cdk = require('aws-cdk-lib');
-const { UserManagementStack } = require('../lib/UserManagementStack');
+const { MainStack } = require('../lib/MainStack');
 
 const app = new cdk.App();
-new UserManagementStack(app, 'UserManagementStack', {
+new MainStack(app, 'MainStack', {
   /* If you don't specify 'env', this stack will be environment-agnostic.
    * Account/Region-dependent features and context lookups will not work,
    * but a single synthesized template can be deployed anywhere. */
