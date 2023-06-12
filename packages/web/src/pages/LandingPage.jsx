@@ -1,18 +1,8 @@
-// function LandingPage() {
-//   return <div>Landing Page</div>;
-// }
-
-// export default LandingPage;
-
 import "./landing-page.css";
 
 function LandingPage() {
   return (
-    <div
-      id="signin"
-      className="w3-container w3-padding-large w3-grey tab"
-      // style={{ display: "none" }}
-    >
+    <div id="signin" className="w3-container w3-padding-large w3-grey tab">
       <div className="w3-section">
         <label>Username</label>
         <input
