@@ -1,0 +1,16 @@
+.map-feature {
+  display: flex;
+  border: 5px solid yellow;
+}
+
+#mapbox {
+  width: 100%;
+  height: 100vh;
+  border: 3px solid green;
+  flex: 1;
+}
+
+.device-details {
+  border: 3px solid blue;
+  width: 300px;
+}

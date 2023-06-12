@@ -1,0 +1,136 @@
+{
+  "type": "geojson",
+  "data": {
+    "type": "FeatureCollection",
+    "features": [
+      {
+        "id": "1",
+        "type": "Feature",
+        "properties": {
+          "thingName": "SmartStud1",
+          "thingType": "SmartStud",
+          "clusterId": "1",
+          "sensorData": {
+            "xl": {
+              "x": 1,
+              "y": 2,
+              "z": 3
+            }
+          }
+        },
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            18.496248,
+            -34.012256
+          ]
+        }
+      },
+      {
+        "id": "2",
+        "type": "Feature",
+        "properties": {
+          "thingName": "SmartStud2",
+          "data": {
+            "xl": {
+              "x": 1,
+              "y": 2,
+              "z": 3
+            }
+          }
+        },
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            18.478176,
+            -34.002660
+          ]
+        }
+      },
+      {
+        "id": "3",
+        "type": "Feature",
+        "properties": {
+          "thingName": "SmartStud3",
+          "data": {
+            "xl": {
+              "x": 1,
+              "y": 2,
+              "z": 3
+            }
+          }
+        },
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            18.465072,
+            -34.034580
+          ]
+        }
+      },
+      {
+        "id": "4",
+        "type": "Feature",
+        "properties": {
+          "thingName": "SmartStud4",
+          "data": {
+            "xl": {
+              "x": 1,
+              "y": 2,
+              "z": 3
+            }
+          }
+        },
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            18.463742,
+            -34.042525
+          ]
+        }
+      },
+      {
+        "id": "5",
+        "type": "Feature",
+        "properties": {
+          "thingName": "SmartStud5",
+          "data": {
+            "xl": {
+              "x": 1,
+              "y": 2,
+              "z": 3
+            }
+          }
+        },
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            18.461442,
+            -34.052994
+          ]
+        }
+      },
+      {
+        "id": "6",
+        "type": "Feature",
+        "properties": {
+          "thingName": "SmartStud6",
+          "data": {
+            "xl": {
+              "x": 1,
+              "y": 2,
+              "z": 3
+            }
+          }
+        },
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            18.458834,
+            -34.065935
+          ]
+        }
+      }
+    ]
+  }
+}
