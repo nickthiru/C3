@@ -14,6 +14,10 @@
 //   return null;
 // }
 
-export default function HttpService() {
+export default function WebsocketService() {
+  // To do
 
+  return {
+    // API
+  };
 }
