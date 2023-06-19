@@ -1,3 +1,7 @@
-@import url("./common/_base.css");
-/* @import url("./common/_defaults.css"); */
-/* @import url("./common/containers.css"); */
+/* @import url("./common/_base.css");
+@import url("./common/_defaults.css");
+@import url("./common/containers.css"); */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
