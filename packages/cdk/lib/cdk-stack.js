@@ -1,7 +1,7 @@
 const { Stack, Duration } = require('aws-cdk-lib');
 // const sqs = require('aws-cdk-lib/aws-sqs');
 
-class BackendStack extends Stack {
+class CdkStack extends Stack {
   /**
    *
    * @param {Construct} scope
@@ -14,10 +14,10 @@ class BackendStack extends Stack {
     // The code that defines your stack goes here
 
     // example resource
-    // const queue = new sqs.Queue(this, 'BackendQueue', {
+    // const queue = new sqs.Queue(this, 'CdkQueue', {
     //   visibilityTimeout: Duration.seconds(300)
     // });
   }
 }
 
-module.exports = { BackendStack }
+module.exports = { CdkStack }
