@@ -1,8 +1,8 @@
 {
-  "name": "@C3/user-management",
+  "name": "@C3",
   "version": "0.1.0",
   "bin": {
-    "user-management": "bin/user-management.js"
+    "user-management": "bin/main.js"
   },
   "scripts": {
     "build": "echo \"The build step is not required when using JavaScript!\" && exit 0",
