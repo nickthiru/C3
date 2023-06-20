@@ -17,14 +17,14 @@
 import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
 import "./App.css";
 
-import LandingPage from "./pages/LandingPage";
+import Login from "./components/login/Login";
 
 export default function App() {
   return (
     <>
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<LandingPage />}></Route>
+          <Route path="/" element={<Login />}></Route>
         </Routes>
       </BrowserRouter>
     </>
