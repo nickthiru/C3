@@ -1,4 +1,4 @@
-async function handler(event, context) {
+exports.handler = async (event, context) => {
   // To do
 
   return {
@@ -6,5 +6,3 @@ async function handler(event, context) {
     body: JSON.stringify("(+) From 'ApiHandler")
   }
 }
-
-module.exports = { handler };
