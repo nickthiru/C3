@@ -1,11 +1,11 @@
-import { CfnOutput, Stack } from "aws-cdk-lib";
-import { UserPool, UserPoolClient } from "aws-cdk-lib/aws-cognito";
+const { CfnOutput, Stack } = require("aws-cdk-lib");
+const { UserPool } = require("aws-cdk-lib/aws-cognito");
 
 class AuthStack extends Stack {
   constructor(scope, id, props) {
     super(scope, id, props);
 
-    this.userpool = new UserPool(this, "C3UserPool", {
+    this.userPool = new UserPool(this, "C3UserPool", {
       selfSignUpEnabled: false,
       signInAliases: {
         username: true,
@@ -17,7 +17,7 @@ class AuthStack extends Stack {
       value: this.userPool.userPoolId
     });
 
-    this.userPoolClient = new UserPoolClient(this, "C3UserPoolClient", {
+    this.userPoolClient = this.userPool.addClient("C3UserPoolClient", {
       authFlows: {
         adminUserPassword: true,
         custom: true,

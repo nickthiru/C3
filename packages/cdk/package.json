@@ -10,11 +10,12 @@
     "test": "jest"
   },
   "devDependencies": {
-    "aws-cdk": "2.79.1",
+    "@aws-cdk/aws-apigatewayv2-integrations-alpha": "^2.85.0-alpha.0",
+    "aws-cdk": "^2.85.0",
     "jest": "^29.5.0"
   },
   "dependencies": {
-    "aws-cdk-lib": "2.79.1",
-    "constructs": "^10.0.0"
+    "aws-cdk-lib": "^2.85.0",
+    "constructs": "^10.2.62"
   }
 }
