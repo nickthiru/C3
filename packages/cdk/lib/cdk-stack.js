@@ -1,5 +1,5 @@
-const { Stack, Duration } = require('aws-cdk-lib');
-// const sqs = require('aws-cdk-lib/aws-sqs');
+const { Stack } = require('aws-cdk-lib');
+const { WebSocketStack } = require("./common/websocket/stacks/websocket-stack.js");
 
 class CdkStack extends Stack {
   /**
@@ -11,12 +11,7 @@ class CdkStack extends Stack {
   constructor(scope, id, props) {
     super(scope, id, props);
 
-    // The code that defines your stack goes here
-
-    // example resource
-    // const queue = new sqs.Queue(this, 'CdkQueue', {
-    //   visibilityTimeout: Duration.seconds(300)
-    // });
+    new WebSocketStack(this, "WebSocketStack");
   }
 }
 
