@@ -17,7 +17,7 @@
 import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
 import "./App.css";
 
-import Login from "./components/login/Login";
+import Login from "./components/common/Login.jsx";
 
 export default function App() {
   return (
