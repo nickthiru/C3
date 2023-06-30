@@ -17,14 +17,18 @@
 import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
 import "./App.css";
 
-import Login from "./components/common/Login.jsx";
+import LoginPage from "./pages/LoginPage.jsx";
+import HomePage from "./pages/HomePage";
 
 export default function App() {
   return (
     <>
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Login />}></Route>
+          <Route path="/" element={<LoginPage />}></Route>
+        </Routes>
+        <Routes>
+          <Route path="/home" element={<HomePage />}></Route>
         </Routes>
       </BrowserRouter>
     </>
