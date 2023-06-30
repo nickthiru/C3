@@ -1,5 +1,5 @@
 const { Stack } = require("aws-cdk-lib");
-const { AuthStack } = require("./auth-stack.js");
+const { AuthStack } = require("../../common/auth/stacks/auth-stack.js");
 
 class UserMgmtStack extends Stack {
   constructor(scope, id, props) {
