@@ -7,21 +7,28 @@
 // }
 
 import { Amplify, Auth } from "aws-amplify";
+import { CdkStackUserMgmtStackAuthStack14D453C0 as AuthStack } from "../../../cdk/outputs.json";
 
 export default function AuthService() {
 
   Amplify.configure({
     Auth: {
+      mandatorySignIn: true,
       region: "us-east-1",
-      userPoolId: "us-east-1_39qiGdVu3",
-      userPoolWebClientId: "31j5srsrau4faftut5sfnskm9j",
+      userPoolId: AuthStack.C3UserPoolId,
+      userPoolWebClientId: AuthStack.C3UserPoolClientId,
       authenticationFlowType: "USER_PASSWORD_AUTH"
     }
   })
 
   async function login(username, password) {
-    const result = await Auth.signIn(username, password);
-    return result;
+    try {
+      const result = await Auth.signIn(username, password);
+      return result;
+    } catch (error) {
+      console.error(error)
+      return undefined;
+    }
   }
 
   return ({

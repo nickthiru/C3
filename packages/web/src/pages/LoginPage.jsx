@@ -19,11 +19,9 @@ export default function LoginPage(props) {
       const loginResponse = await authService.login(username, password);
       if (loginResponse) {
         setLoginSuccess(true);
-        console.log("Login Successful");
         token = loginResponse.signInUserSession.accessToken.jwtToken;
       } else {
         setErrorMessage("Invalid credentials");
-        console.log("Login Unsuccessful");
       }
     } else {
       setErrorMessage("Username and password required!");
@@ -57,7 +55,7 @@ export default function LoginPage(props) {
         <form className="space-y-4" onSubmit={handleFormSubmit}>
           <div>
             <label className="label">
-              <span className="text-base label-text">Email</span>
+              <span className="text-base label-text">Email/Username</span>
             </label>
             <input
               type="text"
