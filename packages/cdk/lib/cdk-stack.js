@@ -1,4 +1,4 @@
-const { Stack } = require('aws-cdk-lib');
+const { Stack, CfnOutput } = require('aws-cdk-lib');
 const { WebSocketStack } = require("./common/websocket/stacks/websocket-lambda-stack.js");
 const { UserMgmtStack } = require("./user-mgmt/stacks/user-mgmt-stack.js");
 
@@ -21,6 +21,8 @@ class CdkStack extends Stack {
     // new CicdStack(this, "CicdStack", {});
 
     new UserMgmtStack(this, "UserMgmtStack", {});
+
+    // new CfnOutput(this, 'CdkStackInfo', { value: this.Stack.CdkStack });
   }
 }
 
