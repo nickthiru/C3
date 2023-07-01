@@ -2,12 +2,15 @@ const { Stack } = require("aws-cdk-lib");
 const { WebSocketApi, WebSocketStage } = require("@aws-cdk/aws-apigatewayv2-alpha");
 const { Function, Code, Runtime } = require("aws-cdk-lib/aws-lambda");
 const { WebSocketLambdaIntegration } = require("@aws-cdk/aws-apigatewayv2-integrations-alpha");
+const { WebSocketLambdaAuthorizer } = require("@aws-cdk/aws-apigatewayv2-authorizers-alpha");
 
 class WebSocketLambdaStack extends Stack {
   constructor(scope, id, props) {
     super(scope, id, props);
 
-    const webSocketApi = new WebSocketApi(this, 'WebSocketApi');
+    const webSocketApi = new WebSocketApi(this, 'WebSocketApi', {
+      connectRouteOptions: ""
+    });
 
     new WebSocketStage(this, 'WebSocketStage', {
       webSocketApi,
