@@ -1,5 +1,5 @@
-import MainMenu from "../MainMenu";
-import OptionsMenu from "../OptionsMenu";
+import MainMenu from "../menus/MainMenu";
+import OptionsMenu from "../menus/OptionsMenu";
 import MainMenuButton from "./MainMenuButton";
 import OptionsMenuButton from "./OptionsMenuButton";
 
