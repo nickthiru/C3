@@ -1,4 +1,4 @@
-// import WebSocketConnection from "./utils/WebSocketConnection";
+// import WebSocket from "./utils/WebSocket";
 // import Header from "./common/Header";
 // import Navigation from "./common/Navigation";
 // import Map from "./map/Map";
@@ -10,7 +10,7 @@ import HomePage from "./pages/HomePage";
 export default function App() {
   let jwtToken = "";
 
-  function saveJwtToken(token) {
+  function onLoginSaveJwtToken(token) {
     jwtToken = token;
     console.log(jwtToken);
   }
@@ -21,7 +21,7 @@ export default function App() {
         <Routes>
           <Route
             path="/"
-            element={<LoginPage onLoginSaveJwtToken={saveJwtToken} />}
+            element={<LoginPage onLoginSaveJwtToken={onLoginSaveJwtToken} />}
           ></Route>
         </Routes>
         <Routes>
