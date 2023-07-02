@@ -21,8 +21,6 @@ class CdkStack extends Stack {
     // new CicdStack(this, "CicdStack", {});
 
     new UserMgmtStack(this, "UserMgmtStack", {});
-
-    // new CfnOutput(this, 'CdkStackInfo', { value: this.Stack.CdkStack });
   }
 }
 
