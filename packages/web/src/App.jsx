@@ -6,23 +6,24 @@
 import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
 import LoginPage from "./pages/LoginPage";
 import HomePage from "./pages/HomePage";
+import { useState } from "react";
+import "dotenv/config";
 
 export default function App() {
+  const { isLoggedIn, setIsLoggedIn } = useState(false);
+
   let jwtToken = "";
 
-  function onLoginSaveJwtToken(token) {
+  function onLogin(token) {
     jwtToken = token;
-    console.log(jwtToken);
+    setIsLoggedIn(true);
   }
 
   return (
     <>
       <BrowserRouter>
         <Routes>
-          <Route
-            path="/"
-            element={<LoginPage onLoginSaveJwtToken={onLoginSaveJwtToken} />}
-          ></Route>
+          <Route path="/" element={<LoginPage onLogin={onLogin} />}></Route>
         </Routes>
         <Routes>
           <Route
