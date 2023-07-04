@@ -8,6 +8,8 @@ export default function LoginPage(props) {
   const [errorMessage, setErrorMessage] = useState("");
   const [loginSuccess, setLoginSuccess] = useState(false);
 
+  // Use Context to store the JWT.
+
   const authService = AuthService();
 
   let token = ""; // Maybe should declare this outside the component? (keep it private)
