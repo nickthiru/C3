@@ -1,6 +1,7 @@
 import { useState } from "react";
 import AuthService from "../services/auth-service.js";
 import { Navigate } from "react-router-dom";
+import secureLocalStorage from "react-secure-storage";
 
 export default function LoginPage(props) {
   const [username, setUsername] = useState("");
@@ -8,7 +9,7 @@ export default function LoginPage(props) {
   const [errorMessage, setErrorMessage] = useState("");
   const [loginSuccess, setLoginSuccess] = useState(false);
 
-  // Use Context to store the JWT.
+  // Store the JWT use "react-secure-storage".
 
   const authService = AuthService();
 

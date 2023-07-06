@@ -4,8 +4,8 @@
 // import Map from "./map/Map";
 
 import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
-import LoginPage from "./pages/login-page";
-import HomePage from "./pages/home-page";
+import LoginPage from "./pages/LoginPage";
+import HomePage from "./pages/HomePage";
 import { useState } from "react";
 import "dotenv/config";
 
