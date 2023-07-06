@@ -12,10 +12,10 @@ class CdkStack extends Stack {
   constructor(scope, id, props) {
     super(scope, id, props);
 
-    // // Common Stacks
-    // new WebSocketStack(this, "WebSocketStack", {
-    //   webSocketLambdaIntegration: lambdaStack.websocketLambdaIntegration
-    // });
+    // Common Stacks
+    new WebSocketStack(this, "WebSocketStack", {
+      webSocketLambdaIntegration: lambdaStack.websocketLambdaIntegration
+    });
     // new SnsStack(this, "SnsStack", {});
     // new MonitorStack(this, "MonitorStack", {});
     // new CicdStack(this, "CicdStack", {});
