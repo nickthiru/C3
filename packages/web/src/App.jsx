@@ -4,35 +4,26 @@
 // import Map from "./map/Map";
 
 import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
-import LoginPage from "./pages/LoginPage";
-import HomePage from "./pages/HomePage";
+import LoginPage from "./pages/login/LoginPage";
+import HomePage from "./pages/home/HomePage";
 import { useState } from "react";
-import "dotenv/config";
 
 export default function App() {
   const { isLoggedIn, setIsLoggedIn } = useState(false);
 
-  let jwtToken = "";
-
-  function onLoginHandler(token) {
-    jwtToken = token;
+  function handleLogin() {
     setIsLoggedIn(true);
   }
 
+  // Check if user is already logged in. If so, go straight to "/home".
   return (
     <>
       <BrowserRouter>
         <Routes>
-          <Route
-            path="/"
-            element={<LoginPage onLogin={onLoginHandler} />}
-          ></Route>
+          <Route path="/" element={<LoginPage onLogin={handleLogin} />}></Route>
         </Routes>
         <Routes>
-          <Route
-            path="/home"
-            element={<HomePage jwtToken={jwtToken} />}
-          ></Route>
+          <Route path="/home" element={<HomePage />}></Route>
         </Routes>
       </BrowserRouter>
     </>
