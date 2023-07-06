@@ -1,5 +1,5 @@
 import { useState } from "react";
-import AuthService from "../services/AuthService.js";
+import AuthService from "../services/auth-service.js";
 import { Navigate } from "react-router-dom";
 
 export default function LoginPage(props) {
@@ -29,7 +29,7 @@ export default function LoginPage(props) {
       setErrorMessage("Username and password required!");
     }
 
-    props.onLoginSaveJwtToken(token);
+    props.onLogin(token);
 
     setUsername("");
     setPassword("");

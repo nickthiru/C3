@@ -1,7 +1,7 @@
-import MainMenu from "../menus/MainMenu";
-import OptionsMenu from "../menus/OptionsMenu";
-import MainMenuButton from "./MainMenuButton";
-import OptionsMenuButton from "./OptionsMenuButton";
+import MainMenu from "../menus/main-menu";
+import OptionsMenu from "../menus/options-menu";
+import MainMenuButton from "./main-menu-button";
+import OptionsMenuButton from "./options-menu-button";
 
 export default function Header() {
   return (

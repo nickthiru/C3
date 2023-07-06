@@ -4,8 +4,8 @@
 // import Map from "./map/Map";
 
 import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
-import LoginPage from "./pages/LoginPage";
-import HomePage from "./pages/HomePage";
+import LoginPage from "./pages/login-page";
+import HomePage from "./pages/home-page";
 import { useState } from "react";
 import "dotenv/config";
 
@@ -14,7 +14,7 @@ export default function App() {
 
   let jwtToken = "";
 
-  function onLogin(token) {
+  function onLoginHandler(token) {
     jwtToken = token;
     setIsLoggedIn(true);
   }
@@ -23,7 +23,10 @@ export default function App() {
     <>
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<LoginPage onLogin={onLogin} />}></Route>
+          <Route
+            path="/"
+            element={<LoginPage onLogin={onLoginHandler} />}
+          ></Route>
         </Routes>
         <Routes>
           <Route
