@@ -22,15 +22,15 @@ class WebSocketStack extends Stack {
             handler: "connect-route-handler.handler"
           })
         ),
-        authorizer: new WebSocketLambdaAuthorizer(
-          "WebsocketLambdaAuthorizer",
-          new Function(this, "WebsocketAuthorizerLambda", {
-            runtime: Runtime.NODEJS_18_X,
-            code: Code.fromAsset(path.join(__dirname, "../handlers/routes")),
-            handler: "auth-handler.handler"
-          }),
-          { identitySource: ["route.request.querystring.token"] }
-        )
+        // authorizer: new WebSocketLambdaAuthorizer(
+        //   "WebsocketLambdaAuthorizer",
+        //   new Function(this, "WebsocketAuthorizerLambda", {
+        //     runtime: Runtime.NODEJS_18_X,
+        //     code: Code.fromAsset(path.join(__dirname, "../handlers/routes")),
+        //     handler: "auth-handler.handler"
+        //   }),
+        //   { identitySource: ["route.request.querystring.token"] }
+        // )
       },
 
       disconnectRouteOptions: {
