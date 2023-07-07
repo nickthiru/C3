@@ -6,6 +6,7 @@ import EmailInput from "./components/EmailInput.jsx";
 import PasswordInput from "./components/PasswordInput.jsx";
 import ForgetPasswordLink from "./components/ForgetPasswordLink.jsx";
 import LoginButton from "./components/LoginButton.jsx";
+import Heading from "./components/Heading.jsx";
 
 export default function LoginPage(props) {
   const [username, setUsername] = useState("");
@@ -16,9 +17,8 @@ export default function LoginPage(props) {
   const authService = AuthService();
 
   useEffect(() => {
-    // When Login is successfull, save the JWT token to Secure Local Storage.
-    store.setItem("token", token);
-  }, [token]);
+    if (token) store.setItem("token", token);
+  });
 
   async function handleFormSubmit(e) {
     e.preventDefault();
@@ -55,9 +55,7 @@ export default function LoginPage(props) {
   return (
     <div className="relative flex flex-col justify-center h-screen overflow-hidden">
       <div className="w-full p-6 m-auto bg-white rounded-md shadow-md ring-2 ring-gray-800/50 lg:max-w-lg">
-        <h1 className="text-3xl font-semibold text-center text-gray-700">
-          C3 App
-        </h1>
+        <Heading />
         <form className="space-y-4" onSubmit={handleFormSubmit}>
           <EmailInput />
           <PasswordInput />
