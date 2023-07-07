@@ -1,8 +1,10 @@
-const { Stack } = require("aws-cdk-lib");
+const { Stack, CfnOutput } = require("aws-cdk-lib");
 const { WebSocketApi, WebSocketStage } = require("@aws-cdk/aws-apigatewayv2-alpha");
 const { Function, Code, Runtime } = require("aws-cdk-lib/aws-lambda");
 const { WebSocketLambdaIntegration } = require("@aws-cdk/aws-apigatewayv2-integrations-alpha");
 const { WebSocketLambdaAuthorizer } = require("@aws-cdk/aws-apigatewayv2-authorizers-alpha");
+
+const path = require("path");
 
 class WebSocketStack extends Stack {
   constructor(scope, id, props) {
@@ -13,49 +15,49 @@ class WebSocketStack extends Stack {
 
       connectRouteOptions: {
         integration: new WebSocketLambdaIntegration(
-          "ConnectRouteWebsocketLambdaIntegration",
-          new Function(this, "ConnectRouteWebsocketLambda", {
+          "ConnectRoute_WebsocketLambdaIntegration",
+          new Function(this, "ConnectRoute_WebsocketLambda", {
             runtime: Runtime.NODEJS_18_X,
-            code: Code.fromAsset(path.join(__dirname, "../handlers/")),
-            handler: "connect-route.handler"
+            code: Code.fromAsset(path.join(__dirname, "../handlers/routes")),
+            handler: "connect-route-handler.handler"
           })
         ),
         authorizer: new WebSocketLambdaAuthorizer(
           "WebsocketLambdaAuthorizer",
           new Function(this, "WebsocketAuthorizerLambda", {
             runtime: Runtime.NODEJS_18_X,
-            code: Code.fromAsset(path.join(__dirname, "../handlers/")),
-            handler: "authorizer.handler"
+            code: Code.fromAsset(path.join(__dirname, "../handlers/routes")),
+            handler: "auth-handler.handler"
           }),
-          { identitySource: "method.request.queryStringParameters.jwtToken" }
+          { identitySource: ["route.request.querystring.token"] }
         )
       },
 
       disconnectRouteOptions: {
         integration: new WebSocketLambdaIntegration(
-          "DisconnectRouteWebsocketLambdaIntegration",
-          new Function(this, "DisconnectRouteWebsocketLambda", {
+          "DisconnectRoute_WebsocketLambdaIntegration",
+          new Function(this, "DisconnectRoute_WebsocketLambda", {
             runtime: Runtime.NODEJS_18_X,
-            code: Code.fromAsset(path.join(__dirname, "../handlers/")),
-            handler: "disconnect-router.handler"
+            code: Code.fromAsset(path.join(__dirname, "../handlers/routes")),
+            handler: "disconnect-router-handler.handler"
           })
         )
       },
 
       defaultRouteOptions: {
         integration: new WebSocketLambdaIntegration(
-          "DefaultRouteWebsocketLambdaIntegration",
-          new Function(this, "DefaultRouteWebsocketLambda", {
+          "DefaultRoute_WebsocketLambdaIntegration",
+          new Function(this, "DefaultRoute_WebsocketLambda", {
             runtime: Runtime.NODEJS_18_X,
-            code: Code.fromAsset(path.join(__dirname, "../handlers/")),
-            handler: "default-route.handler"
+            code: Code.fromAsset(path.join(__dirname, "../handlers/routes")),
+            handler: "default-route-handler.handler"
           })
         )
       }
     });
 
     //
-    new WebSocketStage(this, "WebSocketStage", {
+    const webSocketStage = new WebSocketStage(this, "Dev_WebSocketStage", {
       webSocketApi,
       stageName: "dev",
       autoDeploy: true,
@@ -64,66 +66,32 @@ class WebSocketStack extends Stack {
 
     // Custom Routes
 
-    webSocketApi.addRoute("fromclient", {
-      integration: new WebSocketLambdaIntegration(
-        "FromClientWebsocketLambdaIntegration",
-        new Function(this, "FromClientRouteWebsocketLambda", {
-          runtime: Runtime.NODEJS_18_X,
-          code: Code.fromAsset(path.join(__dirname, "../handlers/")),
-          handler: "fromClient-route.handler"
-        })
-      )
-    });
+    // webSocketApi.addRoute("fromclient", {
+    //   integration: new WebSocketLambdaIntegration(
+    //     "FromClientWebsocketLambdaIntegration",
+    //     new Function(this, "FromClientRouteWebsocketLambda", {
+    //       runtime: Runtime.NODEJS_18_X,
+    //       code: Code.fromAsset(path.join(__dirname, "../handlers/routes")),
+    //       handler: "fromClient-route-handler.handler"
+    //     })
+    //   )
+    // });
 
-    webSocketApi.addRoute("toclient", {
-      integration: new WebSocketLambdaIntegration(
-        "ToClientWebsocketLambdaIntegration",
-        new Function(this, "ToClientRouteWebsocketLambda", {
-          runtime: Runtime.NODEJS_18_X,
-          code: Code.fromAsset(path.join(__dirname, "../handlers/")),
-          handler: "toClient-route.handler"
-        })
-      )
-    });
+    // webSocketApi.addRoute("toclient", {
+    //   integration: new WebSocketLambdaIntegration(
+    //     "ToClientWebsocketLambdaIntegration",
+    //     new Function(this, "ToClientRouteWebsocketLambda", {
+    //       runtime: Runtime.NODEJS_18_X,
+    //       code: Code.fromAsset(path.join(__dirname, "../handlers/routes")),
+    //       handler: "toClient-route-handler.handler"
+    //     })
+    //   )
+    // });
 
-    // new CfnOutput(this, "WebSocketUrl", {
-    //   value: this.webSocketApi.path
-    // })
+    new CfnOutput(this, "DevStage_WebSocketApiEndpoint", {
+      value: `${webSocketApi.apiEndpoint}/${webSocketStage.stageName}`
+    });
   }
 }
 
 module.exports = { WebSocketStack };
-
-
-    // webSocketApi.addRoute("$connect", {
-    //   integration: new WebSocketLambdaIntegration(
-    //     "ConnectRouteWebsocketLambdaIntegration",
-    //     new Function(this, "ConnectRouteWebsocketLambda", {
-    //       runtime: Runtime.NODEJS_18_X,
-    //       code: Code.fromAsset(path.join(__dirname, "../handlers/")),
-    //       handler: "connect-route.handler"
-    //     })
-    //   )
-    // });
-
-    // webSocketApi.addRoute("$disconnect", {
-    //   integration: new WebSocketLambdaIntegration(
-    //     "DisconnectRouteWebsocketLambdaIntegration",
-    //     new Function(this, "DisconnectRouteWebsocketLambda", {
-    //       runtime: Runtime.NODEJS_18_X,
-    //       code: Code.fromAsset(path.join(__dirname, "../handlers/")),
-    //       handler: "disconnect-router.handler"
-    //     })
-    //   )
-    // });
-
-    // webSocketApi.addRoute("$default", {
-    //   integration: new WebSocketLambdaIntegration(
-    //     "DefaultRouteWebsocketLambdaIntegration",
-    //     new Function(this, "DefaultRouteWebsocketLambda", {
-    //       runtime: Runtime.NODEJS_18_X,
-    //       code: Code.fromAsset(path.join(__dirname, "../handlers/")),
-    //       handler: "default-route.handler"
-    //     })
-    //   )
-    // });

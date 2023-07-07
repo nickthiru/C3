@@ -5,7 +5,7 @@ class AuthStack extends Stack {
   constructor(scope, id, props) {
     super(scope, id, props);
 
-    this.userPool = new UserPool(this, "C3UserPool", {
+    this.userPool = new UserPool(this, "UserPool", {
       selfSignUpEnabled: false,
       signInAliases: {
         username: true,
@@ -13,7 +13,7 @@ class AuthStack extends Stack {
       }
     });
 
-    this.userPoolClient = this.userPool.addClient("C3UserPoolClient", {
+    this.userPoolClient = this.userPool.addClient("UserPoolClient", {
       authFlows: {
         adminUserPassword: true,
         custom: true,
@@ -28,10 +28,10 @@ class AuthStack extends Stack {
     // });
 
 
-    new CfnOutput(this, "C3UserPoolId", {
+    new CfnOutput(this, "UserPoolId", {
       value: this.userPool.userPoolId
     });
-    new CfnOutput(this, "C3UserPoolClientId", {
+    new CfnOutput(this, "UserPoolClientId", {
       value: this.userPoolClient.userPoolClientId
     });
   }

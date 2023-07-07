@@ -1,6 +1,7 @@
 const { Stack, CfnOutput } = require('aws-cdk-lib');
-const { WebSocketStack } = require("./common/websocket/stacks/websocket-lambda-stack.js");
-const { UserMgmtStack } = require("./user-mgmt/stacks/user-mgmt-stack.js");
+const { WebSocketStack } = require("./websocket/stacks/websocket-stack.js");
+// const { UserMgmtStack } = require("./user-mgmt/stacks/user-mgmt-stack.js");
+const { AuthStack } = require('./auth/stacks/auth-stack.js');
 
 class CdkStack extends Stack {
   /**
@@ -12,15 +13,13 @@ class CdkStack extends Stack {
   constructor(scope, id, props) {
     super(scope, id, props);
 
-    // Common Stacks
-    new WebSocketStack(this, "WebSocketStack", {
-      webSocketLambdaIntegration: lambdaStack.websocketLambdaIntegration
-    });
     // new SnsStack(this, "SnsStack", {});
     // new MonitorStack(this, "MonitorStack", {});
     // new CicdStack(this, "CicdStack", {});
+    // new UserMgmtStack(this, "UserMgmtStack", {});
 
-    new UserMgmtStack(this, "UserMgmtStack", {});
+    new AuthStack(this, "AuthStack");
+    new WebSocketStack(this, "WebSocketStack");
   }
 }
 
