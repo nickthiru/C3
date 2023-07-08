@@ -53,7 +53,7 @@ class WebSocketStack extends Stack {
             handler: "default-route-handler.handler"
           })
         )
-      }
+      },
     });
 
     //

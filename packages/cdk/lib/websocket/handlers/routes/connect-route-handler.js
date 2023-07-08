@@ -19,4 +19,5 @@ exports.handler = (event, context, callback) => {
   // }
 
   console.log("Inside connect-route-handler.js");
+  console.log("event: " + event);
 }
