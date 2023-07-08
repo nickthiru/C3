@@ -1,4 +1,4 @@
-export default function EmailSection() {
+export default function UsernameInput(props) {
   return (
     <div>
       <label className="label">
@@ -6,9 +6,9 @@ export default function EmailSection() {
       </label>
       <input
         type="text"
-        value={username}
+        value={props.username}
         className="w-full input input-bordered"
-        onChange={(e) => setUsername(e.target.value)}
+        onChange={(e) => props.onInput(e.target.value)}
       />
     </div>
   );

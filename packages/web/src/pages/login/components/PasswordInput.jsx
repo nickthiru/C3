@@ -1,4 +1,4 @@
-export default function PasswordSection() {
+export default function PasswordInput(props) {
   return (
     <div>
       <label className="label">
@@ -6,9 +6,9 @@ export default function PasswordSection() {
       </label>
       <input
         type="password"
-        value={password}
+        value={props.password}
         className="w-full input input-bordered"
-        onChange={(e) => setPassword(e.target.value)}
+        onChange={(e) => props.onInput(e.target.value)}
       />
     </div>
   );

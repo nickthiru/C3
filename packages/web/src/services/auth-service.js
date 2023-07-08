@@ -7,7 +7,8 @@
 // }
 
 import { Amplify, Auth } from "aws-amplify";
-import { CdkStackUserMgmtStackAuthStack14D453C0 as AuthStack } from "../../../cdk/outputs.json";
+
+import { CdkStackAuthStack65D3C934 as auth } from "../../../cdk/outputs.json";
 
 export default function AuthService() {
 
@@ -15,8 +16,8 @@ export default function AuthService() {
     Auth: {
       mandatorySignIn: true,
       region: "us-east-1",
-      userPoolId: AuthStack.C3UserPoolId,
-      userPoolWebClientId: AuthStack.C3UserPoolClientId,
+      userPoolId: auth.UserPoolId,
+      userPoolWebClientId: auth.UserPoolClientId,
       authenticationFlowType: "USER_PASSWORD_AUTH"
     }
   })
