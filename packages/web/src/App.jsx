@@ -1,38 +1,45 @@
 // import Map from "./map/Map";
 
-import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
-import { useState } from "react";
+import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
+import { useRef } from "react";
 
+import Protected from "./common/Protected.jsx";
 import LoginPage from "./pages/login/LoginPage.jsx";
 import HomePage from "./pages/home/HomePage.jsx";
 import Header from "./common/header/Header.jsx";
-import Messenger from "../../utils/messaging/Messenger.jsx";
+import Messenger from "./utils/messaging/Messenger.jsx";
 
 export default function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const navigate = useNavigate();
+  let isLoggedIn = useRef(false);
 
-  function handleOnLogin() {
-    setIsLoggedIn(true);
+  if (isLoggedIn === true) {
+    navigate("/app");
+  } else {
+    navigate("/");
   }
 
-  console.log("isLoggedIn: " + isLoggedIn);
+  function handleLogin() {
+    isLoggedIn = true;
+  }
 
-  // Check if user is already logged in. If so, go straight to "/map".
+  console.log("isLoggedIn: " + isLoggedIn.current);
+
   return (
-    <>
-      <BrowserRouter>
-        <Header />
-
-        {
-          /* Only initiate Messenger if user is logged in */
-          isLoggedIn ? <Messenger /> : null
-        }
-
-        <Routes>
-          <Route path="/" element={<LoginPage onLogin={handleOnLogin} />} />
-          <Route path="/home" element={<HomePage />} />
-        </Routes>
-      </BrowserRouter>
-    </>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<LoginPage onLogin={handleLogin} />} />
+        <Route
+          path="/app"
+          element={
+            <Protected isLoggedIn={isLoggedIn}>
+              <Messenger />
+              <Header />
+              <Route path="/home" element={<HomePage />} />
+            </Protected>
+          }
+        />
+      </Routes>
+    </BrowserRouter>
   );
 }

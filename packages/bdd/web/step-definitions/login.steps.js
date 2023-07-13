@@ -18,3 +18,13 @@ defineFeature(feature, test => {
     });
   });
 });
+
+/*
+
+A user cannot go to any route of the app, unless they are logged in.
+
+If they close the window, then they should be 1) logged out and 2) the token should be made invalid (remove from backend and delete from localstorage).
+
+
+
+*/
