@@ -5,6 +5,7 @@ const { WebSocketLambdaIntegration } = require("@aws-cdk/aws-apigatewayv2-integr
 const { WebSocketLambdaAuthorizer } = require("@aws-cdk/aws-apigatewayv2-authorizers-alpha");
 
 const path = require("path");
+const { Table } = require("aws-cdk-lib/aws-dynamodb");
 
 class WebSocketStack extends Stack {
   constructor(scope, id, props) {
@@ -91,6 +92,9 @@ class WebSocketStack extends Stack {
     new CfnOutput(this, "DevStage_WebSocketApiEndpoint", {
       value: `${webSocketApi.apiEndpoint}/${webSocketStage.stageName}`
     });
+
+    // DDB table to store WebSocket connections
+    const websocketConnectionsTable = new Table(this, "WebsocketConnectionsTable", {})
   }
 }
 
