@@ -94,7 +94,7 @@ class WebSocketStack extends Stack {
     });
 
     // DDB table to store WebSocket connections
-    const websocketConnectionsTable = new Table(this, "WebsocketConnectionsTable", {})
+    // const websocketConnectionsTable = new Table(this, "WebsocketConnectionsTable", {})
   }
 }
 
