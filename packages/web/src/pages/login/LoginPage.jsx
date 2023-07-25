@@ -1,48 +1,62 @@
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import secureLocalStorage from "react-secure-storage";
 
 import AuthService from "../../services/auth-service.js";
 
-export default function LoginPage(props) {
+export default function LoginPage() {
+  // const [token, setToken] = useState("");
   let token = "";
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+
   const navigate = useNavigate();
-
-  if (props.isLoggedIn) navigate("/app");
-
-  const username = useRef("");
-  const password = useRef("");
-  const errorMessage = useRef("");
 
   const authService = AuthService();
 
-  useEffect(() => {
-    secureLocalStorage.setItem("token", token);
-    navigate("/app");
-    props.onLogin();
-  });
+  // useEffect(() => {
+  //   //   console.log("Inside 'useEffect'");
+  //   console.log("token: " + token);
+  //   //   secureLocalStorage.setItem("token", token);
+  // }, [token]);
 
   async function handleFormSubmit(e) {
     e.preventDefault();
 
-    if (username.current && password.current) {
-      const loginResponse = await authService.login(
-        username.current,
-        password.current
-      );
+    console.log("Inside 'handleFormSubmit'");
+
+    if (username && password) {
+      const loginResponse = await authService.login(username, password);
+      // console.log("username: " + username);
+      // console.log("password: " + password);
+      // const loginResponse = true;
       if (loginResponse) {
+        // setToken(loginResponse.signInUserSession.accessToken.jwtToken);
+        // setToken("tenstinistn");
         token = loginResponse.signInUserSession.accessToken.jwtToken;
+        console.log("token from authService: " + token);
+        secureLocalStorage.setItem("token", token);
+        secureLocalStorage.setItem("isLoggedIn", true);
+        console.log(
+          "secureLocalStorage token: " + secureLocalStorage.getItem("token")
+        );
+        console.log(
+          "secureLocalStorage isLoggedIn: " +
+            secureLocalStorage.getItem("isLoggedIn")
+        );
+        navigate("/");
       } else {
-        errorMessage.current = "Invalid credentials";
-        console.log(errorMessage.current);
+        setErrorMessage("Invalid credentials");
+        console.log(errorMessage);
       }
     } else {
-      errorMessage.current = "Username and password required!";
-      console.log(errorMessage.current);
+      setErrorMessage("Username and password required!");
+      console.log(errorMessage);
     }
 
-    username.current = "";
-    password.current = "";
+    setUsername("");
+    setPassword("");
   }
 
   // function renderLoginResult() {
@@ -85,9 +99,9 @@ export default function LoginPage(props) {
             </label>
             <input
               type="text"
-              value={username.current}
+              value={username}
               className="w-full input input-bordered"
-              onChange={(e) => (username.current = e.target.value)}
+              onChange={(e) => setUsername(e.target.value)}
             />
           </div>
           <div>
@@ -96,9 +110,9 @@ export default function LoginPage(props) {
             </label>
             <input
               type="password"
-              value={password.current}
+              value={password}
               className="w-full input input-bordered"
-              onChange={(e) => (password.current = e.target.value)}
+              onChange={(e) => setPassword(e.target.value)}
             />
           </div>
           <a

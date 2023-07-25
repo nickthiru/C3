@@ -3,21 +3,31 @@ import { useNavigate } from "react-router-dom";
 import secureLocalStorage from "react-secure-storage";
 
 export default function OptionsMenu() {
-  const [signOut, setSignOut] = useState(false);
+  // const [signOut, setSignOut] = useState(false);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    if (signOut) {
-      //
-      secureLocalStorage.removeItem("token");
-      secureLocalStorage.setItem("isLoggedIn", false);
-      // Close websocket connection;
-      navigate("/");
-    }
-  });
+  // useEffect(() => {
+  //   if (signOut) {
+  //     //
+  //     secureLocalStorage.removeItem("token");
+  //     secureLocalStorage.setItem("isLoggedIn", false);
+  //     // Close websocket connection;
+  //     navigate("/");
+  //   }
+  // });
 
   function handleSignOut() {
-    setSignOut(true);
+    console.log("Inside 'handleSignOut'");
+    secureLocalStorage.removeItem("token");
+    secureLocalStorage.setItem("isLoggedIn", false);
+    console.log(
+      "secureLocalStorage token: " + secureLocalStorage.getItem("token")
+    );
+    console.log(
+      "secureLocalStorage isLoggedIn: " +
+        secureLocalStorage.getItem("isLoggedIn")
+    );
+    navigate("/login");
   }
 
   return (
