@@ -1,35 +1,87 @@
-const { Stack, CfnOutput } = require("aws-cdk-lib");
+const { Stack, CfnOutput, RemovalPolicy } = require("aws-cdk-lib");
 const { WebSocketApi, WebSocketStage } = require("@aws-cdk/aws-apigatewayv2-alpha");
 const { Function, Code, Runtime } = require("aws-cdk-lib/aws-lambda");
 const { WebSocketLambdaIntegration } = require("@aws-cdk/aws-apigatewayv2-integrations-alpha");
 const { WebSocketLambdaAuthorizer } = require("@aws-cdk/aws-apigatewayv2-authorizers-alpha");
 
 const path = require("path");
-const { Table } = require("aws-cdk-lib/aws-dynamodb");
+const { Table, AttributeType, BillingMode } = require("aws-cdk-lib/aws-dynamodb");
+const { PolicyStatement } = require("aws-cdk-lib/aws-iam");
 
 class WebSocketStack extends Stack {
   constructor(scope, id, props) {
     super(scope, id, props);
 
-    // 
+    // DDB table to store WebSocket connections. This table needs to be set/accessed
+    // in the 'ConnectRoute_WebsocketLambda' (line 20).
+    const websocketConnectionsTable = new Table(this, "WebsocketConnectionsTable", {
+      partitionKey: {
+        name: "connectionId",
+        type: AttributeType.STRING
+      },
+      removalPolicy: RemovalPolicy.DESTROY,
+      billingMode: BillingMode.PAY_PER_REQUEST
+    });
+
+
+    // Lambdas
+    const connectRoute_WebSocketLambda = new Function(this, "ConnectRoute_WebsocketLambda", {
+      runtime: Runtime.NODEJS_18_X,
+      code: Code.fromAsset(path.join(__dirname, "../handlers/routes")),
+      handler: "connect-route-handler.handler",
+      environment: {
+        PRIMARY_KEY: "connectionId",
+        DB_NAME: websocketConnectionsTable.tableName
+      }
+    });
+
+    const disconnectRoute_WebsocketLambda = new Function(this, "DisconnectRoute_WebsocketLambda", {
+      runtime: Runtime.NODEJS_18_X,
+      code: Code.fromAsset(path.join(__dirname, "../handlers/routes")),
+      handler: "disconnect-route-handler.handler",
+      environment: {
+        PRIMARY_KEY: "connectionId",
+        DB_NAME: websocketConnectionsTable.tableName
+      }
+    });
+
+    const defaultRoute_WebsocketLambda = new Function(this, "DefaultRoute_WebsocketLambda", {
+      runtime: Runtime.NODEJS_18_X,
+      code: Code.fromAsset(path.join(__dirname, "../handlers/routes")),
+      handler: "default-route-handler.handler"
+    });
+
+    const websocketAuthorizerLambda = new Function(this, "WebsocketAuthorizerLambda", {
+      runtime: Runtime.NODEJS_18_X,
+      code: Code.fromAsset(path.join(__dirname, "../handlers/routes")),
+      handler: "auth-handler.handler"
+    });
+
+    const fromClientRouteWebsocketLambda = new Function(this, "FromClientRouteWebsocketLambda", {
+      runtime: Runtime.NODEJS_18_X,
+      code: Code.fromAsset(path.join(__dirname, "../handlers/routes")),
+      handler: "fromClient-route-handler.handler"
+    });
+
+    const toClientRouteWebsocketLambda = new Function(this, "ToClientRouteWebsocketLambda", {
+      runtime: Runtime.NODEJS_18_X,
+      code: Code.fromAsset(path.join(__dirname, "../handlers/routes")),
+      handler: "toClient-route-handler.handler"
+    });
+
+
+    // WebSocket
     const webSocketApi = new WebSocketApi(this, "WebSocketApi", {
 
+      // Built-in Routes
       connectRouteOptions: {
         integration: new WebSocketLambdaIntegration(
           "ConnectRoute_WebsocketLambdaIntegration",
-          new Function(this, "ConnectRoute_WebsocketLambda", {
-            runtime: Runtime.NODEJS_18_X,
-            code: Code.fromAsset(path.join(__dirname, "../handlers/routes")),
-            handler: "connect-route-handler.handler"
-          })
+          connectRoute_WebSocketLambda
         ),
         // authorizer: new WebSocketLambdaAuthorizer(
         //   "WebsocketLambdaAuthorizer",
-        //   new Function(this, "WebsocketAuthorizerLambda", {
-        //     runtime: Runtime.NODEJS_18_X,
-        //     code: Code.fromAsset(path.join(__dirname, "../handlers/routes")),
-        //     handler: "auth-handler.handler"
-        //   }),
+        //   websocketAuthorizerLambda,
         //   { identitySource: ["route.request.querystring.token"] }
         // )
       },
@@ -37,27 +89,20 @@ class WebSocketStack extends Stack {
       disconnectRouteOptions: {
         integration: new WebSocketLambdaIntegration(
           "DisconnectRoute_WebsocketLambdaIntegration",
-          new Function(this, "DisconnectRoute_WebsocketLambda", {
-            runtime: Runtime.NODEJS_18_X,
-            code: Code.fromAsset(path.join(__dirname, "../handlers/routes")),
-            handler: "disconnect-router-handler.handler"
-          })
+          disconnectRoute_WebsocketLambda
         )
       },
 
       defaultRouteOptions: {
         integration: new WebSocketLambdaIntegration(
           "DefaultRoute_WebsocketLambdaIntegration",
-          new Function(this, "DefaultRoute_WebsocketLambda", {
-            runtime: Runtime.NODEJS_18_X,
-            code: Code.fromAsset(path.join(__dirname, "../handlers/routes")),
-            handler: "default-route-handler.handler"
-          })
+          defaultRoute_WebsocketLambda
         )
       },
     });
 
-    //
+
+    // WebSocket Stages
     const webSocketStage = new WebSocketStage(this, "Dev_WebSocketStage", {
       webSocketApi,
       stageName: "dev",
@@ -65,36 +110,36 @@ class WebSocketStack extends Stack {
     });
 
 
-    // Custom Routes
-
+    // WebSocket Custom Routes
     // webSocketApi.addRoute("fromclient", {
     //   integration: new WebSocketLambdaIntegration(
     //     "FromClientWebsocketLambdaIntegration",
-    //     new Function(this, "FromClientRouteWebsocketLambda", {
-    //       runtime: Runtime.NODEJS_18_X,
-    //       code: Code.fromAsset(path.join(__dirname, "../handlers/routes")),
-    //       handler: "fromClient-route-handler.handler"
-    //     })
+    //     fromClientRouteWebsocketLambda
     //   )
     // });
 
-    // webSocketApi.addRoute("toclient", {
-    //   integration: new WebSocketLambdaIntegration(
-    //     "ToClientWebsocketLambdaIntegration",
-    //     new Function(this, "ToClientRouteWebsocketLambda", {
-    //       runtime: Runtime.NODEJS_18_X,
-    //       code: Code.fromAsset(path.join(__dirname, "../handlers/routes")),
-    //       handler: "toClient-route-handler.handler"
-    //     })
-    //   )
-    // });
+    webSocketApi.addRoute("toclient", {
+      integration: new WebSocketLambdaIntegration(
+        "ToClientWebsocketLambdaIntegration",
+        toClientRouteWebsocketLambda
+      )
+    });
 
+
+    // Stack Outputs
     new CfnOutput(this, "DevStage_WebSocketApiEndpoint", {
       value: `${webSocketApi.apiEndpoint}/${webSocketStage.stageName}`
     });
 
-    // DDB table to store WebSocket connections
-    // const websocketConnectionsTable = new Table(this, "WebsocketConnectionsTable", {})
+
+    // Permissions
+    websocketConnectionsTable.grantReadWriteData(connectRoute_WebSocketLambda);
+    websocketConnectionsTable.grantReadWriteData(disconnectRoute_WebsocketLambda);
+    // toClientRouteWebsocketLambda.addToRolePolicy(new PolicyStatement({
+    //   effect: Effect.ALLOW,
+    //   resources: [],
+    //   actions: []
+    // }));
   }
 }
 

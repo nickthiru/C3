@@ -1,19 +1,15 @@
-// Need to send JWT token with every websocket frame. Event object key for this is "Authorization".
-
 /*
   Remember to register an "event" at the end of each task/function to SNS.
 */
 
-// exports.handler = function () {
-//   // To do
+const { DynamoDBClient } = require("@aws-sdk/client-dynamodb");
 
-//   // Publish event "addUser"
-// }
 
-const AWS = require('aws-sdk');
-const ddb = new AWS.DynamoDB.DocumentClient();
+const ddbClient = new DynamoDBClient();
 require('./patch.js');
+
 let send = undefined;
+
 function init(event) {
   console.log(event)
 
@@ -22,12 +18,17 @@ function init(event) {
     endpoint: event.requestContext.domainName + '/' + event.requestContext.stage
   });
 
-
-
   send = async (connectionId, data) => {
     await apigwManagementApi.postToConnection({ ConnectionId: connectionId, Data: `Echo: ${data}` }).promise();
   }
 }
+
+function getConnections() {
+  return ddb.scan({
+    TableName: 'Chat',
+  }).promise();
+}
+
 exports.handler = (event, context, callback) => {
   init(event);
   let message = JSON.parse(event.body).message
@@ -41,8 +42,3 @@ exports.handler = (event, context, callback) => {
 
   return {}
 };
-function getConnections() {
-  return ddb.scan({
-    TableName: 'Chat',
-  }).promise();
-}
