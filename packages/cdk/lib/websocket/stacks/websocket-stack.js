@@ -6,7 +6,7 @@ const { WebSocketLambdaAuthorizer } = require("@aws-cdk/aws-apigatewayv2-authori
 
 const path = require("path");
 const { Table, AttributeType, BillingMode } = require("aws-cdk-lib/aws-dynamodb");
-const { PolicyStatement } = require("aws-cdk-lib/aws-iam");
+const { PolicyStatement, Effect } = require("aws-cdk-lib/aws-iam");
 
 class WebSocketStack extends Stack {
   constructor(scope, id, props) {
@@ -66,11 +66,15 @@ class WebSocketStack extends Stack {
     const toClientRouteWebsocketLambda = new Function(this, "ToClientRouteWebsocketLambda", {
       runtime: Runtime.NODEJS_18_X,
       code: Code.fromAsset(path.join(__dirname, "../handlers/routes")),
-      handler: "toClient-route-handler.handler"
+      handler: "toClient-route-handler.handler",
+      environment: {
+        PRIMARY_KEY: "connectionId",
+        DB_NAME: websocketConnectionsTable.tableName
+      }
     });
 
 
-    // WebSocket
+    // WebSocket API
     const webSocketApi = new WebSocketApi(this, "WebSocketApi", {
 
       // Built-in Routes
@@ -135,11 +139,13 @@ class WebSocketStack extends Stack {
     // Permissions
     websocketConnectionsTable.grantReadWriteData(connectRoute_WebSocketLambda);
     websocketConnectionsTable.grantReadWriteData(disconnectRoute_WebsocketLambda);
-    // toClientRouteWebsocketLambda.addToRolePolicy(new PolicyStatement({
-    //   effect: Effect.ALLOW,
-    //   resources: [],
-    //   actions: []
-    // }));
+    websocketConnectionsTable.grantReadWriteData(toClientRouteWebsocketLambda);
+
+    toClientRouteWebsocketLambda.addToRolePolicy(new PolicyStatement({
+      effect: Effect.ALLOW,
+      resources: ["arn:aws:execute-api:us-east-1:346761569124:m71oz07fyl/dev/POST/@connections"],
+      actions: ["execute-api:Invoke"]
+    }));
   }
 }
 

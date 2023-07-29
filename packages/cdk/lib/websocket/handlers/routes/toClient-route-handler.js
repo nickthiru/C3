@@ -2,43 +2,55 @@
   Remember to register an "event" at the end of each task/function to SNS.
 */
 
-const { DynamoDBClient } = require("@aws-sdk/client-dynamodb");
+const { ApiGatewayManagementApiClient, PostToConnectionCommand } = require("@aws-sdk/client-apigatewaymanagementapi");
+const { DynamoDBClient, ScanCommand } = require("@aws-sdk/client-dynamodb");
+const { unmarshall } = require("@aws-sdk/util-dynamodb");
 
-
+const apiGwMgmtApiClient = new ApiGatewayManagementApiClient({
+  endpoint: "https://m71oz07fyl.execute-api.us-east-1.amazonaws.com/dev"
+});
 const ddbClient = new DynamoDBClient();
-require('./patch.js');
 
-let send = undefined;
+exports.handler = async (event, context, callback) => {
+  try {
+    const { Items } = await ddbClient.send(new ScanCommand({
+      TableName: process.env.DB_NAME
+    }));
 
-function init(event) {
-  console.log(event)
+    Items.forEach(async (Item) => {
+      const unmarshalledItem = unmarshall(Item);
+      console.log("connectionId: " + String(unmarshalledItem["connectionId"]));
+      console.log("sending message...");
 
-  const apigwManagementApi = new AWS.ApiGatewayManagementApi({
-    apiVersion: '2018-11-29',
-    endpoint: event.requestContext.domainName + '/' + event.requestContext.stage
-  });
+      let result;
 
-  send = async (connectionId, data) => {
-    await apigwManagementApi.postToConnection({ ConnectionId: connectionId, Data: `Echo: ${data}` }).promise();
-  }
-}
-
-function getConnections() {
-  return ddb.scan({
-    TableName: 'Chat',
-  }).promise();
-}
-
-exports.handler = (event, context, callback) => {
-  init(event);
-  let message = JSON.parse(event.body).message
-  getConnections().then((data) => {
-    console.log(data.Items);
-    data.Items.forEach(function (connection) {
-      console.log("Connection " + connection.connectionid)
-      send(connection.connectionid, message);
+      try {
+        result = await apiGwMgmtApiClient.send(new PostToConnectionCommand({
+          ConnectionId: unmarshalledItem["connectionId"],
+          Data: "Hello!"
+        }));
+        console.log("result: " + result);
+      }
+      catch (err) {
+        console.error(err);
+      }
     });
-  });
+  } catch (err) {
+    console.error(err);
+  }
 
-  return {}
+  // try {
+  //   await apiGwMgmtApiClient.send(new PostToConnectionCommand({
+  //     ConnectionId: "I0n2VfxsoAMCJOw=",
+  //     Data: "Hello"
+  //   }));
+  // } catch (err) {
+  //   console.error(err);
+  // }
+
+  const response = {
+    statusCode: 200
+  }
+
+  callback(null, response);
 };
