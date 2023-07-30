@@ -1,6 +1,6 @@
 const { Stack, CfnOutput, RemovalPolicy } = require("aws-cdk-lib");
-const { WebSocketApi, WebSocketStage } = require("@aws-cdk/aws-apigatewayv2-alpha");
 const { Function, Code, Runtime } = require("aws-cdk-lib/aws-lambda");
+const { WebSocketApi, WebSocketStage } = require("@aws-cdk/aws-apigatewayv2-alpha");
 const { WebSocketLambdaIntegration } = require("@aws-cdk/aws-apigatewayv2-integrations-alpha");
 const { WebSocketLambdaAuthorizer } = require("@aws-cdk/aws-apigatewayv2-authorizers-alpha");
 
@@ -77,6 +77,8 @@ class WebSocketStack extends Stack {
     // WebSocket API
     const webSocketApi = new WebSocketApi(this, "WebSocketApi", {
 
+      routeSelectionExpression: "$request.body.action",
+
       // Built-in Routes
       connectRouteOptions: {
         integration: new WebSocketLambdaIntegration(
@@ -89,14 +91,12 @@ class WebSocketStack extends Stack {
         //   { identitySource: ["route.request.querystring.token"] }
         // )
       },
-
       disconnectRouteOptions: {
         integration: new WebSocketLambdaIntegration(
           "DisconnectRoute_WebsocketLambdaIntegration",
           disconnectRoute_WebsocketLambda
         )
       },
-
       defaultRouteOptions: {
         integration: new WebSocketLambdaIntegration(
           "DefaultRoute_WebsocketLambdaIntegration",
@@ -115,12 +115,12 @@ class WebSocketStack extends Stack {
 
 
     // WebSocket Custom Routes
-    // webSocketApi.addRoute("fromclient", {
-    //   integration: new WebSocketLambdaIntegration(
-    //     "FromClientWebsocketLambdaIntegration",
-    //     fromClientRouteWebsocketLambda
-    //   )
-    // });
+    webSocketApi.addRoute("fromclient", {
+      integration: new WebSocketLambdaIntegration(
+        "FromClientWebsocketLambdaIntegration",
+        fromClientRouteWebsocketLambda
+      )
+    });
 
     webSocketApi.addRoute("toclient", {
       integration: new WebSocketLambdaIntegration(
