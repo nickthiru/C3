@@ -77,6 +77,8 @@ class WebSocketStack extends Stack {
     // WebSocket API
     const webSocketApi = new WebSocketApi(this, "WebSocketApi", {
 
+      // The route selection expression value will name the Lambda Function that will
+      // be invoked (see "WebSocket Custom Routes" section below).
       routeSelectionExpression: "$request.body.action",
 
       // Built-in Routes
@@ -105,15 +107,6 @@ class WebSocketStack extends Stack {
       },
     });
 
-
-    // WebSocket Stages
-    const webSocketStage = new WebSocketStage(this, "Dev_WebSocketStage", {
-      webSocketApi,
-      stageName: "dev",
-      autoDeploy: true,
-    });
-
-
     // WebSocket Custom Routes
     webSocketApi.addRoute("fromclient", {
       integration: new WebSocketLambdaIntegration(
@@ -127,6 +120,13 @@ class WebSocketStack extends Stack {
         "ToClientWebsocketLambdaIntegration",
         toClientRouteWebsocketLambda
       )
+    });
+
+    // WebSocket Stages
+    const webSocketStage = new WebSocketStage(this, "Dev_WebSocketStage", {
+      webSocketApi,
+      stageName: "dev",
+      autoDeploy: true,
     });
 
 
