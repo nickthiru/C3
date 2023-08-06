@@ -1,5 +1,6 @@
 exports.handler = function (event, context, callback) {
-  //   console.log('Received event:', JSON.stringify(event, null, 2));
+  console.log("Inside auth-handler.js");
+  console.log("event: " + JSON.stringify(event));
 
   //   // A simple REQUEST authorizer example to demonstrate how to use request 
   //   // parameters to allow or deny a request. In this example, a request is  
@@ -68,6 +69,4 @@ exports.handler = function (event, context, callback) {
   // var generateDeny = function (principalId, resource) {
   //   return generatePolicy(principalId, 'Deny', resource);
   // }
-
-  console.log("Inside auth-handler.js");
 }

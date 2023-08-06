@@ -53,7 +53,7 @@ class WebSocketStack extends Stack {
 
     const websocketAuthorizerLambda = new Function(this, "WebsocketAuthorizerLambda", {
       runtime: Runtime.NODEJS_18_X,
-      code: Code.fromAsset(path.join(__dirname, "../handlers")),
+      code: Code.fromAsset(path.join(__dirname, "../handlers/routes")),
       handler: "auth-handler.handler"
     });
 
@@ -87,11 +87,11 @@ class WebSocketStack extends Stack {
           "ConnectRoute_WebsocketLambdaIntegration",
           connectRoute_WebSocketLambda
         ),
-        authorizer: new WebSocketLambdaAuthorizer(
-          "WebsocketLambdaAuthorizer",
-          websocketAuthorizerLambda,
-          { identitySource: ["route.request.querystring.token"] }
-        )
+        // authorizer: new WebSocketLambdaAuthorizer(
+        //   "WebsocketLambdaAuthorizer",
+        //   websocketAuthorizerLambda,
+        //   { identitySource: ["route.request.querystring.token"] }
+        // )
       },
       disconnectRouteOptions: {
         integration: new WebSocketLambdaIntegration(
