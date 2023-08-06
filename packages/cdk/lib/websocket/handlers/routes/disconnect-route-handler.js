@@ -1,24 +1,28 @@
-// const AWS = require("aws-sdk");
-// const ddb = new AWS.DynamoDB.DocumentClient();
+const { DynamoDBClient, DeleteItemCommand } = require("@aws-sdk/client-dynamodb");
 
-exports.handler = (event, context, callback) => {
+const ddbClient = new DynamoDBClient();
 
-  //   const connectionId = event.requestContext.connectionId;
-
-  //   addConnectionId(connectionId).then(() => {
-  //     callback(null, {
-  //       statusCode: 200,
-  //     })
-  //   });
-  // }
-
-  // function addConnectionId(connectionId) {
-  //   return ddb.delete({
-  //     TableName: "WebsocketConnectionIds",
-  //     Key: {
-  //       connectionid: connectionId,
-  //     },
-  //   }).promise();
+exports.handler = async (event, context, callback) => {
 
   console.log("Inside disconnect-route-handler.js");
+  console.log(event);
+
+  const connectionId = event.requestContext.connectionId;
+  let result = null;
+
+  try {
+    result = await ddbClient.send(new DeleteItemCommand({
+      TableName: process.env.DB_NAME,
+      Key: {
+        connectionId: { S: connectionId }
+      }
+    }));
+    console.log(result);
+  } catch (err) {
+    console.error(err);
+  }
+
+  return {
+    statusCode: 200,
+  }
 }
