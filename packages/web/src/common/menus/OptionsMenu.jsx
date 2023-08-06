@@ -1,35 +1,6 @@
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import secureLocalStorage from "react-secure-storage";
 
-export default function OptionsMenu() {
-  // const [signOut, setSignOut] = useState(false);
-  const navigate = useNavigate();
-
-  // useEffect(() => {
-  //   if (signOut) {
-  //     //
-  //     secureLocalStorage.removeItem("token");
-  //     secureLocalStorage.setItem("isLoggedIn", false);
-  //     // Close websocket connection;
-  //     navigate("/");
-  //   }
-  // });
-
-  function handleSignOut() {
-    console.log("Inside 'handleSignOut'");
-    secureLocalStorage.removeItem("token");
-    secureLocalStorage.setItem("isLoggedIn", false);
-    console.log(
-      "secureLocalStorage token: " + secureLocalStorage.getItem("token")
-    );
-    console.log(
-      "secureLocalStorage isLoggedIn: " +
-        secureLocalStorage.getItem("isLoggedIn")
-    );
-    navigate("/login");
-  }
-
+export default function OptionsMenu({ setToken }) {
   return (
     <div className="drawer-side">
       <label htmlFor="my-drawer-2" className="drawer-overlay"></label>
@@ -38,7 +9,7 @@ export default function OptionsMenu() {
           <a>Settings</a>
         </li>
         <li>
-          <a onClick={handleSignOut}>Sign Out</a>
+          <a onClick={() => setToken("")}>Sign Out</a>
         </li>
       </ul>
     </div>

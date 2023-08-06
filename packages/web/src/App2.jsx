@@ -14,17 +14,8 @@ export default function App() {
   const [token, setToken] = useState(() => secureLocalStorage.getItem("token"));
 
   useEffect(() => {
-    if (!token) {
-      secureLocalStorage.clear("token");
-      console.log(
-        "token cleared in 'useEffect': " + secureLocalStorage.getItem("token")
-      );
-    } else {
-      secureLocalStorage.setItem("token", token);
-      console.log(
-        "token set in 'useEffect': " + secureLocalStorage.getItem("token")
-      );
-    }
+    secureLocalStorage.setItem("token", token);
+    console.log(secureLocalStorage.getItem("token"));
   }, [token]);
 
   return (

@@ -1,3 +1,4 @@
+/*
 .map-feature {
   display: flex;
   border: 5px solid yellow;
@@ -13,4 +14,19 @@
 .device-details {
   border: 3px solid blue;
   width: 300px;
+}
+*/
+
+.map-wrap {
+  position: relative;
+  width: 100%;
+  height: calc(
+    100vh - 77px
+  ); /* calculate height of the screen minus the heading */
+}
+
+.map {
+  position: absolute;
+  width: 100%;
+  height: 100%;
 }

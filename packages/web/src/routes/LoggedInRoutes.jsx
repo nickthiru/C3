@@ -1,14 +1,13 @@
-import { useRef } from "react";
-import { Outlet } from "react-router-dom";
-import secureLocalStorage from "react-secure-storage";
+import { Navigate, Outlet } from "react-router-dom";
 import LoginPage from "../pages/login/LoginPage";
 
-export default function LoggedInRoutes() {
+export default function LoggedInRoutes({ token, setToken }) {
   console.log("Inside 'LoggedInRoutes'");
-  // const isLoggedIn = useRef(secureLocalStorage.getItem("isLoggedIn"));
-  const isLoggedIn = secureLocalStorage.getItem("isLoggedIn");
-  // const isLoggedIn = false;
-  console.log("isLoggedIn: " + isLoggedIn);
-  // return isLoggedIn.current ? <Outlet /> : <LoginPage />;
-  return isLoggedIn ? <Outlet /> : <LoginPage />;
+  console.log("token: " + token);
+
+  return token ? (
+    <Outlet context={[token, setToken]} />
+  ) : (
+    <Navigate to="/login" />
+  );
 }

@@ -1,25 +1,23 @@
-import { useRef, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import secureLocalStorage from "react-secure-storage";
+import { useState } from "react";
+import { useNavigate, useOutletContext } from "react-router-dom";
 
 import AuthService from "../../services/auth-service.js";
 
 export default function LoginPage() {
-  // const [token, setToken] = useState("");
-  let token = "";
+  console.log("Inside 'Login Page'");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
 
+  const [token, setToken] = useOutletContext();
+
   const navigate = useNavigate();
 
-  const authService = AuthService();
+  console.log("token: " + token);
 
-  // useEffect(() => {
-  //   //   console.log("Inside 'useEffect'");
-  //   console.log("token: " + token);
-  //   //   secureLocalStorage.setItem("token", token);
-  // }, [token]);
+  if (token) navigate("/");
+
+  const authService = AuthService();
 
   async function handleFormSubmit(e) {
     e.preventDefault();
@@ -32,20 +30,21 @@ export default function LoginPage() {
       // console.log("password: " + password);
       // const loginResponse = true;
       if (loginResponse) {
-        // setToken(loginResponse.signInUserSession.accessToken.jwtToken);
+        setToken(loginResponse.signInUserSession.accessToken.jwtToken);
         // setToken("tenstinistn");
-        token = loginResponse.signInUserSession.accessToken.jwtToken;
-        console.log("token from authService: " + token);
-        secureLocalStorage.setItem("token", token);
-        secureLocalStorage.setItem("isLoggedIn", true);
-        console.log(
-          "secureLocalStorage token: " + secureLocalStorage.getItem("token")
-        );
-        console.log(
-          "secureLocalStorage isLoggedIn: " +
-            secureLocalStorage.getItem("isLoggedIn")
-        );
-        navigate("/");
+        // token = loginResponse.signInUserSession.accessToken.jwtToken;
+        // console.log("token from authService: " + token);
+        // secureLocalStorage.setItem("token", token);
+        // secureLocalStorage.setItem("isLoggedIn", true);
+        // console.log(
+        //   "secureLocalStorage token: " + secureLocalStorage.getItem("token")
+        // );
+        // console.log(
+        //   "secureLocalStorage isLoggedIn: " +
+        //     secureLocalStorage.getItem("isLoggedIn")
+        // );
+        // navigate("/");
+        // setToken("dummytoken");
       } else {
         setErrorMessage("Invalid credentials");
         console.log(errorMessage);
@@ -58,33 +57,6 @@ export default function LoginPage() {
     setUsername("");
     setPassword("");
   }
-
-  // function renderLoginResult() {
-  //   if (errorMessage) {
-  //     return <label>{errorMessage}</label>
-  //   }
-  // }
-
-  // return (
-  //   <div role="main">
-  //   {loginSuccess && <Navigate to="/home" replace={true} />}
-  //   <h2>Please Login</h2>
-  //   </div>
-  // );
-
-  // return (
-  //   <div className="relative flex flex-col justify-center h-screen overflow-hidden">
-  //     <div className="w-full p-6 m-auto bg-white rounded-md shadow-md ring-2 ring-gray-800/50 lg:max-w-lg">
-  //       <Heading />
-  //       <form className="space-y-4" onSubmit={handleFormSubmit}>
-  //         <UsernameInput username={username} onInput={setUsername} />
-  //         <PasswordInput password={password} onInput={setPassword} />
-  //         <ForgetPasswordLink />
-  //         <LoginButton />
-  //       </form>
-  //     </div>
-  //   </div>
-  // );
 
   return (
     <div className="relative flex flex-col justify-center h-screen overflow-hidden">
