@@ -54,7 +54,11 @@ class WebSocketStack extends Stack {
     const websocketAuthorizerLambda = new Function(this, "WebsocketAuthorizerLambda", {
       runtime: Runtime.NODEJS_18_X,
       code: Code.fromAsset(path.join(__dirname, "../handlers")),
-      handler: "auth-handler.handler"
+      handler: "auth-handler.handler",
+      environment: {
+        COGNITO_USERPOOL_ID: props.COGNITO_USERPOOL_ID,
+        COGNITO_WEB_CLIENT_ID: props.COGNITO_WEB_CLIENT_ID,
+      }
     });
 
     const fromClientRouteWebsocketLambda = new Function(this, "FromClientRouteWebsocketLambda", {

@@ -5,7 +5,7 @@ class AuthStack extends Stack {
   constructor(scope, id, props) {
     super(scope, id, props);
 
-    this.userPool = new UserPool(this, "UserPool", {
+    const userPool = new UserPool(this, "UserPool", {
       selfSignUpEnabled: false,
       signInAliases: {
         username: true,
@@ -13,7 +13,7 @@ class AuthStack extends Stack {
       }
     });
 
-    this.userPoolClient = this.userPool.addClient("UserPoolClient", {
+    const userPoolClient = userPool.addClient("UserPoolClient", {
       authFlows: {
         adminUserPassword: true,
         custom: true,
@@ -22,20 +22,15 @@ class AuthStack extends Stack {
       }
     });
 
+    // Outputs to WebSocket Authorizer Lambda in the WebSocket Stack
+    this.userPoolId = userPool.userPoolId;
+    this.userPoolClientId = userPoolClient.userPoolClientId;
+
     // new CfnUserPoolGroup(this, "C3Admins", {
     //   userPoolId: this.userPool.userPoolId,
     //   groupName: "admins"
     // });
-
-
-    new CfnOutput(this, "UserPoolId", {
-      value: this.userPool.userPoolId
-    });
-    new CfnOutput(this, "UserPoolClientId", {
-      value: this.userPoolClient.userPoolClientId
-    });
   }
-
 }
 
 module.exports = { AuthStack };

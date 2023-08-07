@@ -18,8 +18,11 @@ class CdkStack extends Stack {
     // new CicdStack(this, "CicdStack", {});
     // new UserMgmtStack(this, "UserMgmtStack", {});
 
-    new AuthStack(this, "AuthStack");
-    new WebSocketStack(this, "WebSocketStack");
+    const authStack = new AuthStack(this, "AuthStack");
+    new WebSocketStack(this, "WebSocketStack", {
+      COGNITO_USERPOOL_ID: authStack.userPoolId,
+      COGNITO_WEB_CLIENT_ID: authStack.userPoolClientId
+    });
   }
 }
 
