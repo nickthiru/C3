@@ -1,14 +1,7 @@
-// export default function AuthService() {
-//   // To do
-
-//   return {
-//     // API
-//   };
-// }
-
 import { Amplify, Auth } from "aws-amplify";
 
 import { CdkStackAuthStack65D3C934 as auth } from "../../../cdk/outputs.json";
+
 
 export default function AuthService() {
 
