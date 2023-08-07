@@ -41,21 +41,25 @@ exports.handler = async function (event, context, callback) {
   const condition = {};
   condition.IpAddress = {};
 
+  console.log("queryStringParameters: " + queryStringParameters.token);
+
   try {
     const payload = await verifier.verify(
-      "eyJraWQeyJhdF9oYXNoIjoidk..." // the JWT as string
+      queryStringParameters.token // the JWT as string
     );
-    console.log("Token is valid. Payload:", payload);
-  } catch {
-    console.log("Token not valid!");
-  }
-
-  if (headers.HeaderAuth1 === "headerValue1"
-    && queryStringParameters.QueryString1 === "queryValue1") {
-    callback(null, generateAllow('me', event.methodArn));
-  } else {
+    console.log("Token is valid. Payload: ", payload);
+    callback(null, generateAllow("user", event.methodArn));
+  } catch (err) {
+    console.log("Token not valid! Error: ", err);
     callback("Unauthorized");
   }
+
+  // if (headers.HeaderAuth1 === "headerValue1"
+  //   && queryStringParameters.QueryString1 === "queryValue1") {
+  //   callback(null, generateAllow('me', event.methodArn));
+  // } else {
+  //   callback("Unauthorized");
+  // }
 };
 
 // Helper function to generate an IAM policy
@@ -88,6 +92,6 @@ const generateAllow = function (principalId, resource) {
   return generatePolicy(principalId, 'Allow', resource);
 }
 
-const generateDeny = function (principalId, resource) {
-  return generatePolicy(principalId, 'Deny', resource);
-}
+// const generateDeny = function (principalId, resource) {
+//   return generatePolicy(principalId, 'Deny', resource);
+// }

@@ -1,9 +1,0 @@
-{
-  "CdkStackAuthStack65D3C934": {
-    "ExportsOutputRefUserPool6BA7E5F296FD7236": "us-east-1_KNtePgrfj",
-    "ExportsOutputRefUserPoolUserPoolClient40176907044A36CF": "25bl2ifigvmsp4hogrvv7ftu54"
-  },
-  "CdkStackWebSocketStackB6D3D0A7": {
-    "DevStageWebSocketApiEndpoint": "wss://m71oz07fyl.execute-api.us-east-1.amazonaws.com/dev"
-  }
-}
