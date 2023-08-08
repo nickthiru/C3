@@ -54,8 +54,12 @@ class WebSocketStack extends Stack {
 
     const websocketAuthorizerLambda = new NodejsFunction(this, "WebsocketAuthorizerLambda", {
       runtime: Runtime.NODEJS_18_X,
-      entry: path.join(__dirname, "../handlers/auth-handler.js"),
-      handler: "auth-handler.handler",
+      entry: (path.join(__dirname, "../handlers/auth-handler.js")),
+      handler: "handler",
+      depsLockFilePath: (path.join(__dirname, "../../../../../package-lock.json")),
+      // bundling: {
+      //   forceDockerBundling: true
+      // },
       environment: {
         COGNITO_USERPOOL_ID: props.COGNITO_USERPOOL_ID,
         COGNITO_WEB_CLIENT_ID: props.COGNITO_WEB_CLIENT_ID,

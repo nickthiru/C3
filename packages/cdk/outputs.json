@@ -6,6 +6,6 @@
     "ExportsOutputRefUserPoolUserPoolClient40176907044A36CF": "5fqfff17pvan8mns6igv9k6ehg"
   },
   "CdkStackWebSocketStackB6D3D0A7": {
-    "DevStageWebSocketApiEndpoint": "wss://t46uvbsgr9.execute-api.us-east-1.amazonaws.com/dev"
+    "DevStageWebSocketApiEndpoint": "wss://4wf1jf87h3.execute-api.us-east-1.amazonaws.com/dev"
   }
 }

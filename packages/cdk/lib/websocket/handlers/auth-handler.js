@@ -84,7 +84,7 @@ const generatePolicy = function (principalId, effect, resource) {
     "numberKey": 123,
     "booleanKey": true
   };
-  console.log(JSON.stringify(authReponse));
+  console.log(JSON.stringify(authResponse));
   return authResponse;
 };
 
