@@ -1,5 +1,4 @@
 const { Stack, CfnOutput, RemovalPolicy } = require("aws-cdk-lib");
-const { NodejsFunction } = require("aws-cdk-lib/aws-lambda-nodejs");
 const { Function, Code, Runtime } = require("aws-cdk-lib/aws-lambda");
 const { WebSocketApi, WebSocketStage } = require("@aws-cdk/aws-apigatewayv2-alpha");
 const { WebSocketLambdaIntegration } = require("@aws-cdk/aws-apigatewayv2-integrations-alpha");
@@ -52,9 +51,9 @@ class WebSocketStack extends Stack {
       handler: "default-route-handler.handler"
     });
 
-    const websocketAuthorizerLambda = new NodejsFunction(this, "WebsocketAuthorizerLambda", {
+    const websocketAuthorizerLambda = new Function(this, "WebsocketAuthorizerLambda", {
       runtime: Runtime.NODEJS_18_X,
-      entry: path.join(__dirname, "../handlers/auth-handler.js"),
+      code: Code.fromAsset(path.join(__dirname, "../handlers")),
       handler: "auth-handler.handler",
       environment: {
         COGNITO_USERPOOL_ID: props.COGNITO_USERPOOL_ID,

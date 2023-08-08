@@ -5,7 +5,7 @@ class AuthStack extends Stack {
   constructor(scope, id, props) {
     super(scope, id, props);
 
-    this.userPool = new UserPool(this, "UserPool", {
+    const userPool = new UserPool(this, "UserPool", {
       selfSignUpEnabled: false,
       signInAliases: {
         username: true,
@@ -13,7 +13,7 @@ class AuthStack extends Stack {
       }
     });
 
-    this.userPoolClient = this.userPool.addClient("UserPoolClient", {
+    const userPoolClient = userPool.addClient("UserPoolClient", {
       authFlows: {
         adminUserPassword: true,
         custom: true,
@@ -28,15 +28,15 @@ class AuthStack extends Stack {
     // });
 
     // Outputs for WebSocket Authorizer Lambda in the WebSocket Stack
-    this.userPoolId = this.userPool.userPoolId;
-    this.userPoolClientId = this.userPoolClient.userPoolClientId;
+    this.userPoolId = userPool.userPoolId;
+    this.userPoolClientId = userPoolClient.userPoolClientId;
 
     // Outputs for 'outputs.json' for React.js Auth service
     new CfnOutput(this, "UserPoolId", {
-      value: this.userPool.userPoolId
+      value: userPool.userPoolId
     });
     new CfnOutput(this, "UserPoolClientId", {
-      value: this.userPoolClient.userPoolClientId
+      value: userPoolClient.userPoolClientId
     });
   }
 
