@@ -40,7 +40,8 @@ export default function App() {
         </Route>
         <Route element={<LoggedInRoutes token={token} setToken={setToken} />}>
           <Route path="/" element={<HomePage />} exact>
-            <Route path="map" element={<MapPage />} />
+            {/* <Route path="map" element={<MapPage />} /> */}
+            <Route index element={<MapPage />} />
             <Route path="device" element={<DeviceMgmtPage />} />
           </Route>
         </Route>
