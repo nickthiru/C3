@@ -6,8 +6,6 @@ import secureLocalStorage from "react-secure-storage";
 
 import LoginPage from "./pages/login/LoginPage.jsx";
 import HomePage from "./pages/home/HomePage.jsx";
-import MapPage from "./pages/map/MapPage.jsx";
-import DeviceMgmtPage from "./pages/device-mgmt/DeviceMgmtPage.jsx";
 import LoggedInRoutes from "./routes/LoggedInRoutes.jsx";
 import NotLoggedInRoutes from "./routes/NotLoggedInRoutes.jsx";
 import Header from "./common/header/Header.jsx";
@@ -39,10 +37,7 @@ export default function App() {
           <Route path="/login" element={<LoginPage />} exact />
         </Route>
         <Route element={<LoggedInRoutes token={token} setToken={setToken} />}>
-          <Route path="/" element={<HomePage />} exact>
-            <Route path="map" element={<MapPage />} />
-            <Route path="device" element={<DeviceMgmtPage />} />
-          </Route>
+          <Route path="/" element={<HomePage />} exact />
         </Route>
       </Routes>
     </>
