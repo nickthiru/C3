@@ -1,5 +1,3 @@
-// import Map from "./map/Map";
-
 import { useState, useEffect } from "react";
 import { Routes, Route } from "react-router-dom";
 import secureLocalStorage from "react-secure-storage";
@@ -40,7 +38,6 @@ export default function App() {
         </Route>
         <Route element={<LoggedInRoutes token={token} setToken={setToken} />}>
           <Route path="/" element={<HomePage />} exact>
-            {/* <Route path="map" element={<MapPage />} /> */}
             <Route index element={<MapPage />} />
             <Route path="device" element={<DeviceMgmtPage />} />
           </Route>
