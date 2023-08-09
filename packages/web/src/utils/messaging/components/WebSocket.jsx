@@ -9,12 +9,25 @@ export default function WebSocket() {
   console.log("token: " + token);
 
   useWebSocket(`${websocketStack.DevStageWebSocketApiEndpoint}`, {
-    queryParams: { token: token },
-    onOpen: (event) => console.log("(+) WebSocket connection opened"),
-    onMessage: (message) => console.log(message),
-    onClose: (event) => console.log("(+) WebSocket connection closed"),
+    queryParams: {
+      token: token,
+    },
+    onOpen: (event) => {
+      console.log("(+) WebSocket connection opened");
+      console.log("Received 'event' onOpen: " + JSON.stringify(event));
+    },
+    onMessage: (message) => {
+      console.log("Received 'message' onMessage: " + JSON.stringify(message));
+    },
+    onClose: (event) => {
+      console.log("(+) WebSocket connection closed");
+      console.log("Received 'event' onClose: " + JSON.stringify(event));
+    },
     // Will attempt to reconnect on all close events, such as server shutting down
-    shouldReconnect: (event) => true,
+    shouldReconnect: (event) => {
+      console.log("Received 'event' shouldReconnect: " + JSON.stringify(event));
+      return true;
+    },
   });
 
   return null;
