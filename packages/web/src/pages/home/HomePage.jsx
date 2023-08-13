@@ -6,7 +6,7 @@ import MapPage from "../map/MapPage.jsx";
 export default function HomePage() {
   return (
     <>
-      <Messenger />
+      {/* <Messenger /> */}
       <MapPage />
     </>
   );

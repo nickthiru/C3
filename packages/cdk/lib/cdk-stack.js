@@ -1,7 +1,10 @@
 const { Stack, CfnOutput } = require('aws-cdk-lib');
 const { WebSocketStack } = require("./websocket/stacks/websocket-stack.js");
+
 // const { UserMgmtStack } = require("./user-mgmt/stacks/user-mgmt-stack.js");
 const { AuthStack } = require('./auth/stacks/auth-stack.js');
+const { DeviceManagementStack } = require('./device-mgmt/stacks/device-mgmt-stack.js');
+const { MapStack } = require('./map/stacks/map-stack.js');
 
 class CdkStack extends Stack {
   /**
@@ -19,10 +22,12 @@ class CdkStack extends Stack {
     // new UserMgmtStack(this, "UserMgmtStack", {});
 
     const authStack = new AuthStack(this, "AuthStack");
-    new WebSocketStack(this, "WebSocketStack", {
+    const webSocketStack = new WebSocketStack(this, "WebSocketStack", {
       COGNITO_USERPOOL_ID: authStack.userPoolId,
       COGNITO_WEB_CLIENT_ID: authStack.userPoolClientId
     });
+    const deviceManagementStack = new DeviceManagementStack(this, "DeviceManagementStack");
+    // const mapStack = new MapStack(this, "MapStack");
   }
 }
 

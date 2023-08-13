@@ -1,4 +1,5 @@
 const { Stack, CfnOutput, RemovalPolicy } = require("aws-cdk-lib");
+const { NodejsFunction } = require("aws-cdk-lib/aws-lambda-nodejs");
 const { Function, Code, Runtime } = require("aws-cdk-lib/aws-lambda");
 const { WebSocketApi, WebSocketStage } = require("@aws-cdk/aws-apigatewayv2-alpha");
 const { WebSocketLambdaIntegration } = require("@aws-cdk/aws-apigatewayv2-integrations-alpha");
@@ -51,10 +52,11 @@ class WebSocketStack extends Stack {
       handler: "default-route-handler.handler"
     });
 
-    const websocketAuthorizerLambda = new Function(this, "WebsocketAuthorizerLambda", {
+    const websocketAuthorizerLambda = new NodejsFunction(this, "WebsocketAuthorizerLambda", {
       runtime: Runtime.NODEJS_18_X,
-      code: Code.fromAsset(path.join(__dirname, "../handlers")),
-      handler: "auth-handler.handler",
+      entry: (path.join(__dirname, "../handlers/auth-handler.js")),
+      handler: "handler",
+      depsLockFilePath: (path.join(__dirname, "../../../../../package-lock.json")),
       environment: {
         COGNITO_USERPOOL_ID: props.COGNITO_USERPOOL_ID,
         COGNITO_WEB_CLIENT_ID: props.COGNITO_WEB_CLIENT_ID,
@@ -64,7 +66,19 @@ class WebSocketStack extends Stack {
     const fromClientRouteWebsocketLambda = new Function(this, "FromClientRouteWebsocketLambda", {
       runtime: Runtime.NODEJS_18_X,
       code: Code.fromAsset(path.join(__dirname, "../handlers/routes")),
-      handler: "fromClient-route-handler.handler"
+      handler: "fromClient-route-handler.handler",
+      initialPolicy: [
+        new PolicyStatement({
+          effect: Effect.ALLOW,
+          resources: ["arn:aws:sns:us-east-1:346761569124:ProvisionSingleDeviceRequestedTopic"],
+          actions: ["sns:Publish"]
+        }),
+        new PolicyStatement({
+          effect: Effect.ALLOW,
+          resources: ["arn:aws:sts::346761569124:assumed-role/*"],
+          actions: ["sns:Publish"]
+        })
+      ]
     });
 
     const toClientRouteWebsocketLambda = new Function(this, "ToClientRouteWebsocketLambda", {
@@ -144,6 +158,12 @@ class WebSocketStack extends Stack {
     websocketConnectionsTable.grantReadWriteData(connectRoute_WebSocketLambda);
     websocketConnectionsTable.grantReadWriteData(disconnectRoute_WebsocketLambda);
     websocketConnectionsTable.grantReadWriteData(toClientRouteWebsocketLambda);
+
+    // fromClientRouteWebsocketLambda.addToRolePolicy(new PolicyStatement({
+    //   effect: Effect.ALLOW,
+    //   resources: ["arn:aws:sns:us-east-1:346761569124:topic:*"],
+    //   actions: ["topic:Publish"]
+    // }));
 
     toClientRouteWebsocketLambda.addToRolePolicy(new PolicyStatement({
       effect: Effect.ALLOW,

@@ -5,7 +5,10 @@
     "ExportsOutputRefUserPool6BA7E5F296FD7236": "us-east-1_uWFBMhUuo",
     "ExportsOutputRefUserPoolUserPoolClient40176907044A36CF": "5fqfff17pvan8mns6igv9k6ehg"
   },
+  "CdkStackDeviceManagementStack1A1F4A39": {
+    "ProvisionSingleDeviceRequestedTopicArn": "arn:aws:sns:us-east-1:346761569124:ProvisionSingleDeviceRequestedTopic"
+  },
   "CdkStackWebSocketStackB6D3D0A7": {
-    "DevStageWebSocketApiEndpoint": "wss://4wf1jf87h3.execute-api.us-east-1.amazonaws.com/dev"
+    "DevStageWebSocketApiEndpoint": "wss://9pzp8ddv76.execute-api.us-east-1.amazonaws.com/dev"
   }
 }
