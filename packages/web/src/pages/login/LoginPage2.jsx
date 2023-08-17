@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate, useOutletContext } from "react-router-dom";
 
-import AuthService from "../../services/auth-service.js";
+// import AuthService from "../../services/auth-service.js";
 
 export default function LoginPage() {
   console.log("Inside 'Login Page'");
@@ -17,7 +17,7 @@ export default function LoginPage() {
 
   if (token) navigate("/");
 
-  const authService = AuthService();
+  // const authService = AuthService();
 
   async function handleFormSubmit(e) {
     e.preventDefault();
@@ -25,26 +25,11 @@ export default function LoginPage() {
     console.log("Inside 'handleFormSubmit'");
 
     if (username && password) {
-      const loginResponse = await authService.login(username, password);
-      // console.log("username: " + username);
-      // console.log("password: " + password);
-      // const loginResponse = true;
+      // const loginResponse = await authService.login(username, password);
+      const loginResponse = true;
       if (loginResponse) {
-        setToken(loginResponse.signInUserSession.accessToken.jwtToken);
-        // setToken("tenstinistn");
-        // token = loginResponse.signInUserSession.accessToken.jwtToken;
-        // console.log("token from authService: " + token);
-        // secureLocalStorage.setItem("token", token);
-        // secureLocalStorage.setItem("isLoggedIn", true);
-        // console.log(
-        //   "secureLocalStorage token: " + secureLocalStorage.getItem("token")
-        // );
-        // console.log(
-        //   "secureLocalStorage isLoggedIn: " +
-        //     secureLocalStorage.getItem("isLoggedIn")
-        // );
-        // navigate("/");
-        // setToken("dummytoken");
+        // setToken(loginResponse.signInUserSession.accessToken.jwtToken);
+        setToken("dummytoken");
       } else {
         setErrorMessage("Invalid credentials");
         console.log(errorMessage);

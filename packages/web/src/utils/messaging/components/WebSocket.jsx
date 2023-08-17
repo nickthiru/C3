@@ -1,14 +1,18 @@
 import { useState } from "react";
 import useWebSocket from "react-use-websocket";
-import { CdkStackWebSocketStackB6D3D0A7 as websocketStack } from "../../../../../cdk/outputs.json";
 import secureLocalStorage from "react-secure-storage";
+
+import { CdkStack } from "../../../../../cdk/outputs.json";
+
+const devStageWebSocketApiEndpoint =
+  CdkStack.WebSocketServiceDevStageWebSocketApiEndpoint1B3C629A;
 
 export default function WebSocket() {
   const [token] = useState(() => secureLocalStorage.getItem("token"));
   console.log("Inside 'Websocket' component'");
   console.log("token: " + token);
 
-  useWebSocket(`${websocketStack.DevStageWebSocketApiEndpoint}`, {
+  useWebSocket(`${devStageWebSocketApiEndpoint}`, {
     queryParams: {
       token: token,
     },
