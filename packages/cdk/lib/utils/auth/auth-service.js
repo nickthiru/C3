@@ -23,22 +23,22 @@ class AuthService extends Construct {
       }
     });
 
-    // new CfnUserPoolGroup(this, "C3Admins", {
-    //   userPoolId: this.userPool.userPoolId,
-    //   groupName: "admins"
-    // });
+    new CfnUserPoolGroup(this, "C3Admin", {
+      userPoolId: userPool.userPoolId,
+      groupName: "admin"
+    });
 
 
     /*** Outputs ***/
 
-    // Outputs for WebSocket Authorizer Lambda in the WebSocket Stack
+    // For WebSocket Authorizer Lambda in the WebSocket Stack
 
     this.userPoolId = userPool.userPoolId;
 
     this.userPoolClientId = userPoolClient.userPoolClientId;
 
 
-    // Outputs for 'outputs.json' for React.js Auth service
+    // For web client Auth service
 
     new CfnOutput(this, "UserPoolId", {
       value: userPool.userPoolId,

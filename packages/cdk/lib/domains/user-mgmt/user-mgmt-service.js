@@ -3,13 +3,7 @@ const { Runtime, Code } = require("aws-cdk-lib/aws-lambda");
 const { SqsToLambda } = require("@aws-solutions-constructs/aws-sqs-lambda");
 const path = require("path");
 
-class SqsLambdaStack extends Stack {
-  /**
-     * 
-     * @param {Construct} scope 
-     * @param {string} id 
-     * @param {StackProps=} props 
-     */
+class UserMgmtStack extends Stack {
   constructor(scope, id, props) {
     super(scope, id, props);
 
@@ -24,4 +18,4 @@ class SqsLambdaStack extends Stack {
   }
 }
 
-module.exports = { SqsLambdaStack };
+module.exports = { UserMgmtStack };

@@ -31,34 +31,34 @@ class WebSocketService extends Construct {
 
     /*** Built-In Route Handling Lambdas ***/
 
-    const connectRouteHandlerLambda = new Function(this, "ConnectRouteHandlerLambda", {
+    const connectRouteLambda = new Function(this, "ConnectRouteLambda", {
       runtime: Runtime.NODEJS_18_X,
       code: Code.fromAsset(path.join(__dirname, "./handlers")),
-      handler: "connect-route-handler.handler",
+      handler: "connect-route.handler",
       environment: {
         webSocketConnectionsTableName: webSocketConnectionsTable.tableName
       }
     });
 
-    const disconnectRouteHandlerLambda = new Function(this, "DisconnectRouteHandlerLambda", {
+    const disconnectRouteLambda = new Function(this, "DisconnectRouteLambda", {
       runtime: Runtime.NODEJS_18_X,
       code: Code.fromAsset(path.join(__dirname, "./handlers")),
-      handler: "disconnect-route-handler.handler",
+      handler: "disconnect-route.handler",
       environment: {
         webSocketConnectionsTableName: webSocketConnectionsTable.tableName
       }
     });
 
-    const defaultRouteHandlerLambda = new Function(this, "DefaultRouteHandlerLambda", {
+    const defaultRouteLambda = new Function(this, "DefaultRouteLambda", {
       runtime: Runtime.NODEJS_18_X,
       code: Code.fromAsset(path.join(__dirname, "./handlers")),
-      handler: "default-route-handler.handler"
+      handler: "default-route.handler"
     });
 
     // To perform authorization of a websocket connection 
-    const webSocketAuthHandlerLambda = new NodejsFunction(this, "WebSocketAuthHandlerLambda", {
+    const webSocketLambdaAuthorizer = new NodejsFunction(this, "WebSocketLambdaAuthorizer", {
       runtime: Runtime.NODEJS_18_X,
-      entry: (path.join(__dirname, "./handlers/websocket-auth-handler.js")),
+      entry: (path.join(__dirname, "./handlers/websocket-lambda-authorizer.js")),
       handler: "handler",
       depsLockFilePath: (path.join(__dirname, "../../../../../package-lock.json")),
       environment: {
@@ -82,11 +82,11 @@ class WebSocketService extends Construct {
       connectRouteOptions: {
         integration: new WebSocketLambdaIntegration(
           "ConnectRouteWebsocketLambdaIntegration",
-          connectRouteHandlerLambda
+          connectRouteLambda
         ),
         authorizer: new WebSocketLambdaAuthorizer(
           "WebSocketLambdaAuthorizer",
-          webSocketAuthHandlerLambda,
+          webSocketLambdaAuthorizer,
           { identitySource: ["route.request.querystring.token"] }
         )
       },
@@ -94,14 +94,14 @@ class WebSocketService extends Construct {
       disconnectRouteOptions: {
         integration: new WebSocketLambdaIntegration(
           "DisconnectRouteWebsocketLambdaIntegration",
-          disconnectRouteHandlerLambda
+          disconnectRouteLambda
         )
       },
 
       defaultRouteOptions: {
         integration: new WebSocketLambdaIntegration(
           "DefaultRouteWebsocketLambdaIntegration",
-          defaultRouteHandlerLambda
+          defaultRouteLambda
         )
       },
     });
@@ -110,15 +110,16 @@ class WebSocketService extends Construct {
     /*** Custom Route Handling Lambdas ***/
 
     // To receive messages from the web client
-    const fromWebClientRouteHandlerLambda = new Function(this, "FromWebClientRouteHandlerLambda", {
+    const fromWebClientRouteLambda = new Function(this, "FromWebClientRouteLambda", {
       runtime: Runtime.NODEJS_18_X,
       code: Code.fromAsset(path.join(__dirname, "./handlers")),
-      handler: "from-web-client-route-handler.handler",
+      handler: "from-web-client-route.handler",
       initialPolicy: [
         // Allow this lambda to publish to all SNS topics
         new PolicyStatement({
           effect: Effect.ALLOW,
-          resources: ["arn:aws:sns:us-east-1:346761569124:topic:*"],
+          // resources: ["arn:aws:sns:us-east-1:346761569124:topic:*"],
+          resources: ["arn:aws:sns:us-east-1:346761569124:*"],
           actions: ["sns:Publish"]
         }),
         // Allow cognito users, with temp STS token, to publish to SNS
@@ -131,10 +132,10 @@ class WebSocketService extends Construct {
     });
 
     // To send messages to the web client
-    const toWebClientRouteHandlerLambda = new Function(this, "ToWebClientRouteHandlerLambda", {
+    const toWebClientRouteLambda = new Function(this, "ToWebClientRouteLambda", {
       runtime: Runtime.NODEJS_18_X,
       code: Code.fromAsset(path.join(__dirname, "./handlers")),
-      handler: "to-web-client-route-handler.handler",
+      handler: "to-web-client-route.handler",
       environment: {
         webSocketConnectionsTableName: webSocketConnectionsTable.tableName,
         webSocketApiEndpoint: webSocketApi.apiEndpoint
@@ -146,22 +147,22 @@ class WebSocketService extends Construct {
 
     webSocketApi.addRoute("fromwebclient", {
       integration: new WebSocketLambdaIntegration(
-        "FromWebClientWebsocketLambdaIntegration",
-        fromWebClientRouteHandlerLambda
+        "FromWebClientRouteWebsocketLambdaIntegration",
+        fromWebClientRouteLambda
       )
     });
 
     webSocketApi.addRoute("towebclient", {
       integration: new WebSocketLambdaIntegration(
-        "ToWebClientWebsocketLambdaIntegration",
-        toWebClientRouteHandlerLambda
+        "ToWebClientRouteWebsocketLambdaIntegration",
+        toWebClientRouteLambda
       )
     });
 
 
     /*** WebSocket Stages ***/
 
-    const webSocketStage = new WebSocketStage(this, "DevWebSocketStage", {
+    const devWebSocketStage = new WebSocketStage(this, "DevWebSocketStage", {
       webSocketApi,
       stageName: "dev",
       autoDeploy: true,
@@ -181,20 +182,11 @@ class WebSocketService extends Construct {
     // });
 
 
-    /*** Stack Outputs ***/
-
-    new CfnOutput(this, "DevStageWebSocketApiEndpoint", {
-      value: `${webSocketApi.apiEndpoint}/${webSocketStage.stageName}`,
-      description: "'dev' stage websocket API endpoint to be used by web client",
-      exportName: "DevStageWebSocketApiEndpoint"
-    });
-
-
     /*** Permissions ***/
 
-    webSocketConnectionsTable.grantReadWriteData(connectRouteHandlerLambda);
-    webSocketConnectionsTable.grantReadWriteData(disconnectRouteHandlerLambda);
-    webSocketConnectionsTable.grantReadWriteData(toWebClientRouteHandlerLambda);
+    webSocketConnectionsTable.grantReadWriteData(connectRouteLambda);
+    webSocketConnectionsTable.grantReadWriteData(disconnectRouteLambda);
+    webSocketConnectionsTable.grantReadWriteData(toWebClientRouteLambda);
 
     // fromClientRouteWebsocketLambda.addToRolePolicy(new PolicyStatement({
     //   effect: Effect.ALLOW,
@@ -202,11 +194,22 @@ class WebSocketService extends Construct {
     //   actions: ["topic:Publish"]
     // }));
 
-    toWebClientRouteHandlerLambda.addToRolePolicy(new PolicyStatement({
+    toWebClientRouteLambda.addToRolePolicy(new PolicyStatement({
       effect: Effect.ALLOW,
       resources: ["arn:aws:execute-api:us-east-1:346761569124:m71oz07fyl/dev/POST/@connections"],
       actions: ["execute-api:Invoke"]
     }));
+
+
+    /*** Stack Outputs ***/
+
+    // For web client
+
+    new CfnOutput(this, "DevStageWebSocketApiEndpoint", {
+      value: `${webSocketApi.apiEndpoint}/${devWebSocketStage.stageName}`,
+      description: "'dev' stage websocket API endpoint to be used by web client",
+      exportName: "DevStageWebSocketApiEndpoint"
+    });
   }
 }
 

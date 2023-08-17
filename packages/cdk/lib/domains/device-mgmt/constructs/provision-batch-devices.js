@@ -1,3 +1,4 @@
+const { Construct } = require("constructs");
 const { SqsToLambda } = require("@aws-solutions-constructs/aws-sqs-lambda");
 const { Stack, CfnOutput } = require("aws-cdk-lib");
 const { PolicyStatement, Effect } = require("aws-cdk-lib/aws-iam");
@@ -7,7 +8,7 @@ const { Queue } = require("aws-cdk-lib/aws-sqs");
 const path = require("path");
 
 
-class ProvisionBatchDevicesStack extends Stack {
+class ProvisionBatchDevices extends Construct {
   constructor(scope, id, props) {
     super(scope, id, props);
 
@@ -28,20 +29,20 @@ class ProvisionBatchDevicesStack extends Stack {
 
     /*** SQS-Lambdas (event commands) ***/
 
-    // const provisionSingleDeviceCommand_Queue = new Queue(this, "ProvisionSingleDeviceCommand_Queue");
+    // const provisionSingleDeviceCommandQueue = new Queue(this, "ProvisionSingleDeviceCommandQueue");
 
-    const provisionBatchDevicesCommand_Lambda = new Function(this, "ProvisionBatchDevicesCommand_Lambda", {
+    const provisionBatchDevicesCommandLambda = new Function(this, "ProvisionBatchDevicesCommandLambda", {
       runtime: Runtime.NODEJS_18_X,
       code: Code.fromAsset(path.join(__dirname, "../handlers")),
-      handler: "provision-batch-devices-handler.handler",
+      handler: "provision-batch-devices.handler",
       environment: {
         provisionSingleDeviceRequestedTopicArn: props.provisionSingleDeviceRequestedTopicArn
       }
     });
 
-    // const provisionSingleDeviceCommand_SqsToLambda_Pattern = new SqsToLambda(this, "ProvisionSingleDeviceCommand_SqsToLambda_Pattern", {
-    //   existingLambdaObj: provisionSingleDeviceCommand_Lambda,
-    //   existingQueueObj: provisionSingleDeviceCommand_Queue
+    // const provisionSingleDeviceCommandSqsToLambdaPattern = new SqsToLambda(this, "ProvisionSingleDeviceCommandSqsToLambdaPattern", {
+    //   existingLambdaObj: provisionSingleDeviceCommandLambda,
+    //   existingQueueObj: provisionSingleDeviceCommandQueue
     // });
 
 
@@ -56,4 +57,4 @@ class ProvisionBatchDevicesStack extends Stack {
     // });
   }
 }
-module.exports = { ProvisionBatchDevicesStack };
+module.exports = { ProvisionBatchDevices };
