@@ -7,14 +7,15 @@ const { DynamoDBClient, ScanCommand } = require("@aws-sdk/client-dynamodb");
 const { unmarshall } = require("@aws-sdk/util-dynamodb");
 
 const apiGwMgmtApiClient = new ApiGatewayManagementApiClient({
-  endpoint: "https://m71oz07fyl.execute-api.us-east-1.amazonaws.com/dev"
+  endpoint: process.env.webSocketApiEndpoint
 });
+
 const ddbClient = new DynamoDBClient();
 
 exports.handler = async (event, context, callback) => {
   try {
     const { Items } = await ddbClient.send(new ScanCommand({
-      TableName: process.env.DB_NAME
+      TableName: process.env.webSocketConnectionsTable
     }));
 
     Items.forEach(async (Item) => {
@@ -22,10 +23,8 @@ exports.handler = async (event, context, callback) => {
       console.log("connectionId: " + String(unmarshalledItem["connectionId"]));
       console.log("sending message...");
 
-      let result;
-
       try {
-        result = await apiGwMgmtApiClient.send(new PostToConnectionCommand({
+        const result = await apiGwMgmtApiClient.send(new PostToConnectionCommand({
           ConnectionId: unmarshalledItem["connectionId"],
           Data: "Hello!"
         }));

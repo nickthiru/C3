@@ -10,6 +10,7 @@ const client = new SNSClient();
 
 exports.handler = async (event, context, callback) => {
   console.log("Inside 'fromclient' route handler");
+  console.log("event: " + JSON.stringify(event));
 
   const body = JSON.parse(event["body"]);
 

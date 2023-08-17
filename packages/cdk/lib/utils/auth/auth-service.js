@@ -1,7 +1,8 @@
-const { CfnOutput, Stack } = require("aws-cdk-lib");
+const { Construct } = require("constructs");
+const { CfnOutput } = require("aws-cdk-lib");
 const { UserPool, CfnUserPoolGroup } = require("aws-cdk-lib/aws-cognito");
 
-class AuthStack extends Stack {
+class AuthService extends Construct {
   constructor(scope, id, props) {
     super(scope, id, props);
 
@@ -27,19 +28,31 @@ class AuthStack extends Stack {
     //   groupName: "admins"
     // });
 
+
+    /*** Outputs ***/
+
     // Outputs for WebSocket Authorizer Lambda in the WebSocket Stack
+
     this.userPoolId = userPool.userPoolId;
+
     this.userPoolClientId = userPoolClient.userPoolClientId;
 
+
     // Outputs for 'outputs.json' for React.js Auth service
+
     new CfnOutput(this, "UserPoolId", {
-      value: userPool.userPoolId
+      value: userPool.userPoolId,
+      description: "Cognito user pool ID used by AWS Amplify in the web client's auth service",
+      exportName: "CongnitoUserPoolId"
     });
+
     new CfnOutput(this, "UserPoolClientId", {
-      value: userPoolClient.userPoolClientId
+      value: userPoolClient.userPoolClientId,
+      description: "Cognito user pool client ID used by AWS Amplify in the web client's auth service",
+      exportName: "CognitoUserPoolClientId"
     });
   }
 
 }
 
-module.exports = { AuthStack };
+module.exports = { AuthService };

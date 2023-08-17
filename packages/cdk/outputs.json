@@ -1,0 +1,7 @@
+{
+  "CdkStack": {
+    "AuthServiceUserPoolId68A34E5E": "us-east-1_dUZP3Pmeh",
+    "AuthServiceUserPoolClientId28CC5FDA": "2a01ah8cbnu6jr47m5rph054sn",
+    "WebSocketServiceDevStageWebSocketApiEndpoint1B3C629A": "wss://r8omwlu4b9.execute-api.us-east-1.amazonaws.com/dev"
+  }
+}

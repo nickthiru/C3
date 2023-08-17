@@ -5,15 +5,13 @@ const ddbClient = new DynamoDBClient();
 exports.handler = async (event, context, callback) => {
   console.log("Inside connect-route-handler.js");
   console.log("event: " + JSON.stringify(event));
-  console.log("process.env.websocketConnectionsTableName: " + process.env.websocketConnectionsTableName);
-
-  const websocketConnectionId = event.requestContext.connectionId;
+  console.log("process.env.webSocketConnectionsTableName: " + process.env.webSocketConnectionsTableName);
 
   try {
     const result = await ddbClient.send(new PutItemCommand({
-      TableName: process.env.websocketConnectionsTableName,
+      TableName: process.env.webSocketConnectionsTableName,
       Item: {
-        connectionId: { S: websocketConnectionId }
+        connectionId: { S: event.requestContext.connectionId }  // WebSocket connection ID
       }
     }));
     console.log(result);
