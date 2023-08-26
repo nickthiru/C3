@@ -1,0 +1,18 @@
+{
+  "CdkStackDeviceManagementStackTopicStackB0EB383E": {
+    "ProvisionSingleDeviceRequestedTopicArn": "arn:aws:sns:us-east-1:346761569124:ProvisionSingleDeviceRequestedTopic",
+    "ExportsOutputRefProvisionSingleDeviceRequestedTopic5297CF12A501D61C": "arn:aws:sns:us-east-1:346761569124:ProvisionSingleDeviceRequestedTopic"
+  },
+  "CdkStackAuthStack65D3C934": {
+    "UserPoolClientId": "poj7r3birka8n55avqpss093j",
+    "UserPoolId": "us-east-1_5yL1FXmr4",
+    "ExportsOutputRefUserPool6BA7E5F296FD7236": "us-east-1_5yL1FXmr4",
+    "ExportsOutputRefUserPoolUserPoolClient40176907044A36CF": "poj7r3birka8n55avqpss093j"
+  },
+  "CdkStackDeviceManagementStackQueueStack67840F11": {
+    "ExportsOutputFnGetAttProvisionSingleDeviceQueue96AF53C9Arn80EFAFC0": "arn:aws:sqs:us-east-1:346761569124:CdkStackDeviceManagementStackQueu-ProvisionSingleDeviceQueue96AF53C-vaQv1vlTjEx5"
+  },
+  "CdkStackWebSocketStackB6D3D0A7": {
+    "DevStageWebSocketApiEndpoint": "wss://1bzdlm7mgl.execute-api.us-east-1.amazonaws.com/dev"
+  }
+}
