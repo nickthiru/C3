@@ -33,7 +33,7 @@ exports.handler = async (event, context, callback) => {
 
   // 7. Test connection and communication between device and IoT Core
 
-  // 8. Publish 'completed' event to SNS
+  // 8. Publish to 'ProvisionSingleDeviceCompletedTopic' event to SNS
 
 
   /*** Output Gate ***/
@@ -45,7 +45,7 @@ exports.handler = async (event, context, callback) => {
 
   // try {
   //   var response = await client.send(new PublishCommand({
-  //     TopicArn: process.env.TOPIC_ARN,
+  //     TopicArn: process.env.topicArn,
   //     Message: "ProvisionSingleDeviceCommand completed!",
   //   }));
   //   console.log("response: " + JSON.stringify(response));

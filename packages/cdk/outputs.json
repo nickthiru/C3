@@ -1,8 +1,0 @@
-{
-  "CdkStack": {
-    "AuthServiceUserPoolId68A34E5E": "us-east-1_E5HPHgWGC",
-    "DeviceManagementServiceProvisionSingleDeviceProvisionSingleDeviceRequestedTopicArnEB6204BD": "arn:aws:sns:us-east-1:346761569124:ProvisionSingleDeviceRequestedTopic",
-    "AuthServiceUserPoolClientId28CC5FDA": "rphkkfd45dgibnq2osbgancn7",
-    "WebSocketServiceDevStageWebSocketApiEndpoint1B3C629A": "wss://4qbydnj51h.execute-api.us-east-1.amazonaws.com/dev"
-  }
-}

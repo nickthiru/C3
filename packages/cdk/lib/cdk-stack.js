@@ -1,14 +1,14 @@
 const { Stack } = require('aws-cdk-lib');
-const { AuthService } = require('./utils/auth/auth-service.js');
-const { WebSocketService } = require("./utils/websocket/websocket-service.js");
-const { DeviceManagementService } = require('./domains/device-mgmt/device-mgmt-service.js');
 
-// const { UserMgmtStack } = require("./domains/user-mgmt/user-mgmt-service-construct.js");
-// const { MapStack } = require('./domains/map/map-service-construct.js');
+const { AuthStack } = require('./utils/auth/auth-stack.js');
+const { WebSocketStack } = require("./utils/websocket/websocket-stack.js");
+const { DeviceManagementStack } = require('./domains/device-mgmt/device-mgmt-stack.js');
+
+// const { UserMgmtStack } = require("./domains/user-mgmt/user-mgmt-stack.js");
+// const { MapStack } = require('./domains/map/map-stack.js');
 
 class CdkStack extends Stack {
   /**
-   *
    * @param {Construct} scope
    * @param {string} id
    * @param {StackProps=} props
@@ -16,17 +16,22 @@ class CdkStack extends Stack {
   constructor(scope, id, props) {
     super(scope, id, props);
 
-    const authServ = new AuthService(this, "AuthService");
+    /*** Utilities ***/
 
-    const wsServ = new WebSocketService(this, "WebSocketService", {
+    const auth = new AuthStack(this, "AuthStack");
+
+    const ws = new WebSocketStack(this, "WebSocketStack", {
       // Required by connect route lambda authorizer. For cdk/lib/utils/websocket/stacks/routes/connect-route-stack/WebSocketAuthorizerLambda
-      cognitoUserPoolId: authServ.userPoolId,
-      cognitoUserPoolClientId: authServ.userPoolClientId
+      cognitoUserPoolId: auth.userPoolId,
+      cognitoUserPoolClientId: auth.userPoolClientId
     });
 
-    const deviceManagementService = new DeviceManagementService(this, "DeviceManagementService");
 
-    // const mapService = new MapService(this, "MapService");
+    /*** Business Domains ***/
+
+    const deviceMgmt = new DeviceManagementStack(this, "DeviceManagementStack");
+
+    // const map = new MapDomain(this, "MapDomain");
   }
 }
 

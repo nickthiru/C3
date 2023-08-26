@@ -1,8 +1,7 @@
-const { Construct } = require("constructs");
-const { CfnOutput } = require("aws-cdk-lib");
+const { Stack, CfnOutput } = require("aws-cdk-lib");
 const { UserPool, CfnUserPoolGroup } = require("aws-cdk-lib/aws-cognito");
 
-class AuthService extends Construct {
+class AuthStack extends Stack {
   constructor(scope, id, props) {
     super(scope, id, props);
 
@@ -55,4 +54,4 @@ class AuthService extends Construct {
 
 }
 
-module.exports = { AuthService };
+module.exports = { AuthStack };

@@ -1,7 +1,7 @@
 const { Stack } = require("aws-cdk-lib");
 const { Bucket } = require("aws-cdk-lib/aws-s3");
 
-class UiDeploymentStack extends Stack {
+class UiStack extends Stack {
   constructor(scope, id, props) {
     super(scope, id, props);
 
@@ -11,4 +11,4 @@ class UiDeploymentStack extends Stack {
   }
 }
 
-module.exports = { UiDeploymentStack };
+module.exports = { UiStack };

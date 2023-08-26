@@ -6,25 +6,38 @@ const { SnsToSqs } = require("@aws-solutions-constructs/aws-sns-sqs");
 const { SqsToLambda } = require("@aws-solutions-constructs/aws-sqs-lambda");
 const { PolicyStatement, Effect } = require("aws-cdk-lib/aws-iam");
 
-class EventCommandPattern extends Construct {
+/**
+ * @description This factory pattern uses a combination of an SNS Topic, an SQS Queue, and a Lambda
+ */
+class TopicCommandFactory extends Stack {
+  /**
+   * @param {Construct} scope
+   * @param {string} id
+   * @param {StackProps=} props
+   */
   constructor(scope, id, props) {
 
-    // const eventCommandName = props.eventCommandName;
-    // const handlerLocation = props.codeLocation;  // Relative to the directory of the Lambda definition
-    // const handlerName = props.handlerName;
-    // const topicArn = props.topicArn;
+    const { topicsList } = props;
+    console.log("events: " + events);
+
+
 
     const {
-      eventName,
-      handlerLocation,
-      handlerName,
+      topicName,
       topicArn,
-      topicName
+      handlerName
     } = props;
+
+    console.log("eventName: " + eventName);
+    console.log("handlerName: " + handlerName);
+    console.log("topicArn: " + topicArn);
+    console.log("topicName: " + topicName);
+
+    const handlerFolderLocation = "../handlers"  // Relative to the directory of the Lambda definition file
 
     const lambda = new Function(this, `${eventName}CommandLambda`, {
       runtime: Runtime.NODEJS_18_X,
-      code: Code.fromAsset(path.join(__dirname, `${handlerLocation}`)),
+      code: Code.fromAsset(path.join(__dirname, `${handlerFolderLocation}`)),
       handler: `${handlerName}.handler`,
       environment: {
         topicArn: topicArn
@@ -44,3 +57,5 @@ class EventCommandPattern extends Construct {
     });
   }
 }
+
+module.exports = { TopicCommandFactory };

@@ -1,0 +1,8 @@
+{
+  "events": [
+    "new device added to map"
+  ],
+  "subscriptions": [
+    "Provision single device completed"
+  ]
+}
