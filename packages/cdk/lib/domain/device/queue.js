@@ -1,7 +1,7 @@
 const { Stack } = require("aws-cdk-lib");
 const { Queue } = require("aws-cdk-lib/aws-sqs");
 
-class DeviceManagementQueueStack extends Stack {
+class QueueStack extends Stack {
   constructor(scope, id, props) {
     super(scope, id, props);
 
@@ -9,4 +9,4 @@ class DeviceManagementQueueStack extends Stack {
   }
 }
 
-module.exports = { DeviceManagementQueueStack };
+module.exports = { QueueStack };

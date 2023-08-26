@@ -1,10 +1,10 @@
 const { Stack } = require("aws-cdk-lib");
-const { SnsToSqsToLambdaPattern } = require("../../../patterns/sns-sqs-lambda-pattern");
+const { SnsToSqsToLambdaPattern } = require("../../construct/sns-sqs-lambda.js");
 // const { SnsToSqs } = require("@aws-solutions-constructs/aws-sns-sqs");
 // const { SqsToLambda } = require("@aws-solutions-constructs/aws-sqs-lambda");
 
 
-class DeviceManagementSnsToSqsToLambdaStack extends Stack {
+class SnsToSqsToLambdaStack extends Stack {
   constructor(scope, id, props) {
     super(scope, id, props);
 
@@ -28,4 +28,4 @@ class DeviceManagementSnsToSqsToLambdaStack extends Stack {
   }
 }
 
-module.exports = { DeviceManagementSnsToSqsToLambdaStack };
+module.exports = { SnsToSqsToLambdaStack };

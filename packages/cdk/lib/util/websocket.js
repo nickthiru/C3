@@ -30,8 +30,8 @@ class WebSocketStack extends Stack {
 
     const connectRouteLambda = new Function(this, "ConnectRouteLambda", {
       runtime: Runtime.NODEJS_18_X,
-      code: Code.fromAsset(path.join(__dirname, "./handlers/routes")),
-      handler: "connect-route-handler.handler",
+      code: Code.fromAsset(path.join(__dirname, "../../src/util/websocket/route")),
+      handler: "connect.handler",
       environment: {
         webSocketConnectionsTableName: webSocketConnectionsTable.tableName
       }
@@ -39,8 +39,8 @@ class WebSocketStack extends Stack {
 
     const disconnectRouteLambda = new Function(this, "DisconnectRouteLambda", {
       runtime: Runtime.NODEJS_18_X,
-      code: Code.fromAsset(path.join(__dirname, "./handlers/routes")),
-      handler: "disconnect-route-handler.handler",
+      code: Code.fromAsset(path.join(__dirname, "../../src/util/websocket/route")),
+      handler: "disconnect.handler",
       environment: {
         webSocketConnectionsTableName: webSocketConnectionsTable.tableName
       }
@@ -48,16 +48,16 @@ class WebSocketStack extends Stack {
 
     const defaultRouteLambda = new Function(this, "DefaultRouteLambda", {
       runtime: Runtime.NODEJS_18_X,
-      code: Code.fromAsset(path.join(__dirname, "./handlers/routes")),
-      handler: "default-route-handler.handler"
+      code: Code.fromAsset(path.join(__dirname, "../../src/util/websocket/route")),
+      handler: "default.handler"
     });
 
     // To perform authorization of a websocket connection 
     const webSocketLambdaAuthorizer = new NodejsFunction(this, "WebSocketLambdaAuthorizer", {
       runtime: Runtime.NODEJS_18_X,
-      entry: (path.join(__dirname, "./handlers/lambda-authorizer-handler.js")),
+      entry: (path.join(__dirname, "../../src/util/websocket/auth.js")),
       handler: "handler",
-      depsLockFilePath: (path.join(__dirname, "../../../../../package-lock.json")),
+      depsLockFilePath: (path.join(__dirname, "../../../../package-lock.json")),
       environment: {
         cognitoUserPoolId: props.cognitoUserPoolId,
         cognitoUserPoolClientId: props.cognitoUserPoolClientId,
@@ -109,8 +109,8 @@ class WebSocketStack extends Stack {
     // To receive messages from the web client
     const fromWebClientRouteLambda = new Function(this, "FromWebClientRouteLambda", {
       runtime: Runtime.NODEJS_18_X,
-      code: Code.fromAsset(path.join(__dirname, "./handlers/routes")),
-      handler: "from-web-client-route-handler.handler",
+      code: Code.fromAsset(path.join(__dirname, "../../src/util/websocket/route")),
+      handler: "from-web-client.handler",
       initialPolicy: [
         // Allow this lambda to publish to all SNS topics
         new PolicyStatement({
@@ -131,8 +131,8 @@ class WebSocketStack extends Stack {
     // To send messages to the web client
     const toWebClientRouteLambda = new Function(this, "ToWebClientRouteLambda", {
       runtime: Runtime.NODEJS_18_X,
-      code: Code.fromAsset(path.join(__dirname, "./handlers/routes")),
-      handler: "to-web-client-route-handler.handler",
+      code: Code.fromAsset(path.join(__dirname, "../../src/util/websocket/route")),
+      handler: "to-web-client.handler",
       environment: {
         webSocketConnectionsTableName: webSocketConnectionsTable.tableName,
         webSocketApiEndpoint: webSocketApi.apiEndpoint

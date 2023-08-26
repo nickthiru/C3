@@ -1,11 +1,11 @@
 const { Stack } = require('aws-cdk-lib');
 
-const { AuthStack } = require('./utils/auth/auth-stack.js');
-const { WebSocketStack } = require("./utils/websocket/websocket-stack.js");
-const { DeviceManagementStack } = require('./domains/device-mgmt/device-mgmt-stack.js');
+const { AuthStack } = require('./util/auth.js');
+const { WebSocketStack } = require("./util/websocket.js");
+const { DeviceManagementStack } = require('./domain/device/main.js');
 
-// const { UserMgmtStack } = require("./domains/user-mgmt/user-mgmt-stack.js");
-// const { MapStack } = require('./domains/map/map-stack.js');
+// const { UserMgmtStack } = require("./domain/user/main.js");
+// const { MapStack } = require('./domain/map/main.js');
 
 class CdkStack extends Stack {
   /**

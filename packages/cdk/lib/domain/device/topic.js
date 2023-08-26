@@ -2,7 +2,7 @@ const { Stack } = require("aws-cdk-lib");
 const { Topic } = require("aws-cdk-lib/aws-sns");
 const { CfnOutput } = require("aws-cdk-lib");
 
-class DeviceManagementTopicStack extends Stack {
+class TopicStack extends Stack {
   constructor(scope, id, props) {
     super(scope, id, props);
 
@@ -28,4 +28,4 @@ class DeviceManagementTopicStack extends Stack {
   }
 }
 
-module.exports = { DeviceManagementTopicStack };
+module.exports = { TopicStack };
