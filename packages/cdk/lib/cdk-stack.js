@@ -1,7 +1,7 @@
 const { Stack } = require('aws-cdk-lib');
 
 const { AuthStack } = require('./util/auth.js');
-const { WebSocketStack } = require("./util/websocket.js");
+const { WebSocketStack } = require("./util/websocket/websocket.js");
 const { DeviceManagementStack } = require('./domain/device/main.js');
 
 // const { UserMgmtStack } = require("./domain/user/main.js");
