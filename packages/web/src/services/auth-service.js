@@ -1,9 +1,9 @@
 import { Amplify, Auth } from "aws-amplify";
 
-import { CdkStack } from "../../../cdk/outputs.json";
+import { CdkStackAuthStack65D3C934 } from "../../../cdk/outputs.json";
 
-const userPoolId = CdkStack.AuthServiceUserPoolId68A34E5E;
-const userPoolClientId = CdkStack.AuthServiceUserPoolClientId28CC5FDA;
+const userPoolId = CdkStackAuthStack65D3C934.UserPoolId;
+const userPoolClientId = CdkStackAuthStack65D3C934.UserPoolClientId;
 
 
 export default function AuthService() {
