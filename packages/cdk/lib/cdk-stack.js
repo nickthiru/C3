@@ -1,11 +1,11 @@
 const { Stack } = require('aws-cdk-lib');
-
-const { AuthStack } = require('./util/auth.js');
-const { WebSocketStack } = require("./util/websocket/websocket.js");
-const { DeviceManagementStack } = require('./domain/device/main.js');
+const { CognitoStack } = require("./cognito-stack.js");
+const { DataStack } = require('./data-stack.js');
+const { WebSocketBuiltInRoutesLambdaStack, WebSocketCustomRoutesLambdaStack } = require('./lambda/websocket-lambda-stack.js');
+const { WebSocketApiStack, WebSocketCustomRoutesIntegrationStack } = require('./api/websocket/websocket-api-stack.js');
 
 // const { UserMgmtStack } = require("./domain/user/main.js");
-// const { MapStack } = require('./domain/map/main.js');
+
 
 class CdkStack extends Stack {
   /**
@@ -16,22 +16,34 @@ class CdkStack extends Stack {
   constructor(scope, id, props) {
     super(scope, id, props);
 
-    /*** Utilities ***/
+    // const cognitoStack = new CognitoStack(this, "CognitoStack");
+    new CognitoStack(this, "CognitoStack");
 
-    const auth = new AuthStack(this, "AuthStack");
-
-    const ws = new WebSocketStack(this, "WebSocketStack", {
-      // Required by connect route lambda authorizer. For cdk/lib/utils/websocket/stacks/routes/connect-route-stack/WebSocketAuthorizerLambda
-      cognitoUserPoolId: auth.userPoolId,
-      cognitoUserPoolClientId: auth.userPoolClientId
-    });
+    const dataStack = new DataStack(this, "DataStack");
 
 
-    /*** Business Domains ***/
+    /*** WebSocket Resources ***/
 
-    const deviceMgmt = new DeviceManagementStack(this, "DeviceManagementStack");
+    const webSocketBuiltInRoutesLambdaStack = new WebSocketBuiltInRoutesLambdaStack(this, "WebSocketBuiltInRoutesLambdaStack");
 
-    // const map = new MapDomain(this, "MapDomain");
+    const webSocketApiStack = new WebSocketApiStack(this, "WebSocketApiStack", { webSocketBuiltInRoutesLambdaStack });
+
+    // const webSocketCustomRoutesLambdaStack = new WebSocketCustomRoutesLambdaStack(this, "WebSocketCustomRoutesLambdaStack", { dataStack, webSocketApiStack });
+    const webSocketCustomRoutesLambdaStack = new WebSocketCustomRoutesLambdaStack(this, "WebSocketCustomRoutesLambdaStack");
+
+    new WebSocketCustomRoutesIntegrationStack(this, "WebSocketCustomRoutesIntegrationStack", { webSocketApiStack, webSocketCustomRoutesLambdaStack });
+
+
+    // const deviceMgmt = new DeviceManagementStack(this, "DeviceManagementStack");
+
+    // const map = new MapStack(this, "MapStack", { deviceMgmt });
+
+
+    /*** Permissions ***/
+
+    dataStack.webSocketConnectionsTable.grantReadWriteData(webSocketBuiltInRoutesLambdaStack.webSocketConnectRouteLambda)
+    dataStack.webSocketConnectionsTable.grantReadWriteData(webSocketBuiltInRoutesLambdaStack.webSocketDisconnectRouteLambda)
+    dataStack.webSocketConnectionsTable.grantReadWriteData(webSocketCustomRoutesLambdaStack.webSocketToWebClientRouteLambda);
   }
 }
 

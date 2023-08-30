@@ -5,7 +5,9 @@ class QueueStack extends Stack {
   constructor(scope, id, props) {
     super(scope, id, props);
 
-    this.provisionDeviceWorkflowQueue = new Queue(this, "ProvisionDeviceWorkflowQueue");
+    // this.addSingleProvisionedDeviceToMapQueue = new Queue(this, "AddSingleProvisionedDeviceToMapQueue");
+
+    this.updateMapGeoJsonWorkflowQueue = new Queue(this, "UpdateMapWorkflowQueue");
   }
 }
 

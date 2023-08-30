@@ -6,24 +6,24 @@ class TopicStack extends Stack {
   constructor(scope, id, props) {
     super(scope, id, props);
 
-    this.provisionSingleDeviceRequestedTopic = new Topic(this, "ProvisionSingleDeviceRequestedTopic",
+    this.provisionDeviceRequestedTopic = new Topic(this, "ProvisionDeviceRequestedTopic",
       {
-        displayName: "Provision single device requested topic",
-        topicName: "ProvisionSingleDeviceRequestedTopic"
+        displayName: "Provision device(s) requested topic",
+        topicName: "ProvisionDeviceRequestedTopic"
       });
 
-    this.provisionSingleDeviceCompletedTopic = new Topic(this, "ProvisionSingleDeviceCompletedTopic",
+    this.provisionDeviceWorkflowCompletedTopic = new Topic(this, "ProvisionDeviceWorkflowCompletedTopic",
       {
-        displayName: "Provision single device completed topic",
-        topicName: "ProvisionSingleDeviceCompletedTopic"
+        displayName: "Provision device(s) workflow completed topic",
+        topicName: "ProvisionDeviceWorkflowCompletedTopic"
       });
 
 
     /*** Outputs ***/
 
-    // For web client
-    new CfnOutput(this, "ProvisionSingleDeviceRequestedTopicArn", {
-      value: this.provisionSingleDeviceRequestedTopic.topicArn
+    new CfnOutput(this, "ProvisionDeviceRequestedTopicArn", {
+      value: provisionDeviceRequestedTopic.topicArn,
+      exportName: "ProvisionDeviceRequestedTopicArn"
     });
   }
 }

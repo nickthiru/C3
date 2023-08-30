@@ -1,11 +1,12 @@
 const { Stack, CfnOutput } = require("aws-cdk-lib");
 const { UserPool, CfnUserPoolGroup } = require("aws-cdk-lib/aws-cognito");
 
-class AuthStack extends Stack {
+
+class CognitoStack extends Stack {
   constructor(scope, id, props) {
     super(scope, id, props);
 
-    const userPool = new UserPool(this, "UserPool", {
+    this.userPool = new UserPool(this, "UserPool", {
       selfSignUpEnabled: false,
       signInAliases: {
         username: true,
@@ -13,7 +14,7 @@ class AuthStack extends Stack {
       }
     });
 
-    const userPoolClient = userPool.addClient("UserPoolClient", {
+    this.userPoolClient = this.userPool.addClient("UserPoolClient", {
       authFlows: {
         adminUserPassword: true,
         custom: true,
@@ -23,35 +24,28 @@ class AuthStack extends Stack {
     });
 
     new CfnUserPoolGroup(this, "C3Admin", {
-      userPoolId: userPool.userPoolId,
+      userPoolId: this.userPool.userPoolId,
       groupName: "admin"
     });
 
 
     /*** Outputs ***/
 
-    // For WebSocket Authorizer Lambda in the WebSocket Stack
-
-    this.userPoolId = userPool.userPoolId;
-
-    this.userPoolClientId = userPoolClient.userPoolClientId;
-
-
     // For web client Auth service
 
     new CfnOutput(this, "UserPoolId", {
-      value: userPool.userPoolId,
+      value: this.userPool.userPoolId,
       description: "Cognito user pool ID used by AWS Amplify in the web client's auth service",
-      exportName: "CongnitoUserPoolId"
+      exportName: "UserPoolId"
     });
 
     new CfnOutput(this, "UserPoolClientId", {
-      value: userPoolClient.userPoolClientId,
+      value: this.userPoolClient.userPoolClientId,
       description: "Cognito user pool client ID used by AWS Amplify in the web client's auth service",
-      exportName: "CognitoUserPoolClientId"
+      exportName: "UserPoolClientId"
     });
   }
 
 }
 
-module.exports = { AuthStack };
+module.exports = { CognitoStack };

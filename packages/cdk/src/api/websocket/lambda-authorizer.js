@@ -2,8 +2,8 @@ const { CognitoJwtVerifier } = require("aws-jwt-verify");
 
 // Verifier that expects valid access tokens:
 const verifier = CognitoJwtVerifier.create({
-  userPoolId: process.env.cognitoUserPoolId,
-  clientId: process.env.cognitoUserPoolClientId,
+  userPoolId: process.env.userPoolId,
+  clientId: process.env.userPoolClientId,
   tokenUse: "access"
 });
 

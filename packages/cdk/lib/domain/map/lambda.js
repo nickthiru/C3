@@ -8,12 +8,12 @@ class LambdaStack extends Stack {
 
     const { topic } = props;
 
-    this.provisionDeviceWorkflowLambda = new Function(this, "ProvisionDeviceWorkflowLambda", {
+    this.updateMapGeoJsonWorkflowLambda = new Function(this, "UpdateMapGeoJsonWorkflowLambda", {
       runtime: Runtime.NODEJS_18_X,
       code: Code.fromAsset(path.join(__dirname, "../../../src/domain/device")),
-      handler: "provision-device.handler",
+      handler: "update-map-geojson.handler",
       environment: {
-        outputEvents: topic.provisionDeviceWorkflowCompletedTopic.topicArn
+        outputEvents: topic.updateMapGeoJsonWorkflowCompletedTopic.topicArn
       }
     });
   }

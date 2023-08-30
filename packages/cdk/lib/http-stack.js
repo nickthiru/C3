@@ -5,7 +5,7 @@ const lambda = require("aws-cdk-lib/aws-lambda");
 const path = require("path");
 const ApiHandler = require("../src/api-handler.js");
 
-class HttpStack extends Stack {
+class HttpApiStack extends Stack {
 
   constructor(scope, id, props) {
     super(scope, id, props);
@@ -29,4 +29,4 @@ class HttpStack extends Stack {
 
 }
 
-module.exports = { HttpStack };
+module.exports = { HttpApiStack };

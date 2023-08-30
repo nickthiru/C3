@@ -1,33 +1,21 @@
 const { Stack } = require("aws-cdk-lib");
 
-const { DeviceManagementTopicStack } = require("./stacks/device-mgmt-topic-stack.js");
-const { DeviceManagementLambdaStack } = require("./stacks/device-mgmt-lambda-stack.js");
-const { DeviceManagementQueueStack } = require("./stacks/device-mgmt-queue-stack.js");
-const { DeviceManagementSnsToSqsToLambdaStack } = require("./stacks/device-mgmt-sns-sqs-lambda-stack.js");
-
-
-// const topicObj = {
-//   businessEvents: [
-//     "ProvisionSingleDeviceRequested"
-//   ]
-// };
-
-// const businessEvents = ["ProvisionSingleDeviceRequested"];
-
+const { TopicStack } = require("./topic.js");
+const { LambdaStack } = require("./lambda.js");
+const { QueueStack } = require("./queue.js");
+const { SnsToSqsToLambdaStack } = require("./sns-sqs-lambda.js");
 
 class MapStack extends Stack {
   constructor(scope, id, props) {
     super(scope, id, props);
 
-    const topic = new MapTopicStack(this, "DeviceManagementTopicStack");
+    const topic = new TopicStack(this, "TopicStack");
 
-    const queue = new MapQueueStack(this, "DeviceManagementQueueStack");
+    const queue = new QueueStack(this, "QueueStack");
 
-    const lambda = new MapLambdaStack(this, "DeviceManagementLambdaStack", { topic });
+    const lambda = new LambdaStack(this, "LambdaStack", { topic });
 
-    new MapSnsToSqsToLambdaStack(this, "DeviceManagementSnsToSqsToLambdaPatternsStack", { topic, queue, lambda });
-
-    // new DeviceManagementSubscriptionStack(this, "DeviceManagementSubscriptionStack");
+    new SnsToSqsToLambdaStack(this, "SnsToSqsToLambdaStack", { topic, queue, lambda });
   }
 }
 

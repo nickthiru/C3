@@ -7,14 +7,14 @@ class SnsToSqsToLambdaPattern extends Construct {
   constructor(scope, id, props) {
     super(scope, id, props);
 
-    const { command, topicObj, queueObj, lambdaObj } = props;
+    const { workflow, topicObj, queueObj, lambdaObj } = props;
 
-    new SnsToSqs(this, `${command}SnsToSqs`, {
+    new SnsToSqs(this, `${workflow}SnsToSqs`, {
       existingTopicObj: topicObj,
       existingQueueObj: queueObj
     });
 
-    new SqsToLambda(this, `${command}SqsToLambda`, {
+    new SqsToLambda(this, `${workflow}SqsToLambda`, {
       existingQueueObj: queueObj,
       existingLambdaObj: lambdaObj
     });

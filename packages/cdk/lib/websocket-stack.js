@@ -4,63 +4,84 @@ const { Function, Code, Runtime } = require("aws-cdk-lib/aws-lambda");
 const { WebSocketApi, WebSocketStage } = require("@aws-cdk/aws-apigatewayv2-alpha");
 const { WebSocketLambdaIntegration } = require("@aws-cdk/aws-apigatewayv2-integrations-alpha");
 const { WebSocketLambdaAuthorizer } = require("@aws-cdk/aws-apigatewayv2-authorizers-alpha");
-const { Table, AttributeType, BillingMode } = require("aws-cdk-lib/aws-dynamodb");
+// const { Table, AttributeType, BillingMode } = require("aws-cdk-lib/aws-dynamodb");
 const { PolicyStatement, Effect } = require("aws-cdk-lib/aws-iam");
 const path = require("path");
+
+// const { Topic } = require("aws-cdk-lib/aws-sns");
+const { Queue } = require("aws-cdk-lib/aws-sqs");
+const { SqsToLambda } = require("@aws-solutions-constructs/aws-sqs-lambda");
+// const { SnsToSqsToLambdaPattern } = require("../../construct/sns-sqs-lambda.js");
+
 
 class WebSocketStack extends Stack {
   constructor(scope, id, props) {
     super(scope, id, props);
 
+    const { cognitoStack, dataStack } = props;
+
+    // const userPoolId = cognitoStack.userPool.userPoolId;
+    // const userPoolClientId = cognitoStack.userPoolClient.userPoolClientId;
+
+    // const webSocketConnectionsTableName = dataStack.webSocketConnectionsTable.tableName;
+
+
+    const webSocketRouteFunctionsLocation = "../src/api/websocket/route";
+    const webSocketLambdaAuthorizerHandlerLocation = "../src/api/websocket/lambda-authorizer.js";
+    const packageLockJsonLocation = "../../../package-lock.json";
+
+
     /*** Data Storage ***/
 
     // DDB table to store WebSocket connections. This table needs to be set/accessed
     // in the 'ConnectRoute_WebsocketLambda' (line 20).
-    const webSocketConnectionsTable = new Table(this, "WebSocketConnectionsTable", {
-      partitionKey: {
-        name: "connectionId",
-        type: AttributeType.STRING
-      },
-      removalPolicy: RemovalPolicy.DESTROY,
-      billingMode: BillingMode.PAY_PER_REQUEST
-    });
+    // const webSocketConnectionsTable = new Table(this, "WebSocketConnectionsTable", {
+    //   partitionKey: {
+    //     name: "connectionId",
+    //     type: AttributeType.STRING
+    //   },
+    //   removalPolicy: RemovalPolicy.DESTROY,
+    //   billingMode: BillingMode.PAY_PER_REQUEST
+    // });
 
 
     /*** Built-In Route Handling Lambdas ***/
 
-    const connectRouteLambda = new Function(this, "ConnectRouteLambda", {
+    const webSocketConnectRouteLambda = new Function(this, "WebSocketConnectRouteLambda", {
       runtime: Runtime.NODEJS_18_X,
-      code: Code.fromAsset(path.join(__dirname, "../../src/util/websocket/route")),
+      code: Code.fromAsset(path.join(__dirname, webSocketRouteFunctionsLocation)),
       handler: "connect.handler",
       environment: {
-        webSocketConnectionsTableName: webSocketConnectionsTable.tableName
+        // webSocketConnectionsTableName: webSocketConnectionsTable.tableName
+        webSocketConnectionsTableName: dataStack.webSocketConnectionsTable.tableName
       }
     });
 
-    const disconnectRouteLambda = new Function(this, "DisconnectRouteLambda", {
+    const webSocketDisconnectRouteLambda = new Function(this, "WebSocketDisconnectRouteLambda", {
       runtime: Runtime.NODEJS_18_X,
-      code: Code.fromAsset(path.join(__dirname, "../../src/util/websocket/route")),
+      code: Code.fromAsset(path.join(__dirname, webSocketRouteFunctionsLocation)),
       handler: "disconnect.handler",
       environment: {
-        webSocketConnectionsTableName: webSocketConnectionsTable.tableName
+        // webSocketConnectionsTableName: webSocketConnectionsTable.tableName
+        webSocketConnectionsTableName: dataStack.webSocketConnectionsTable.tableName
       }
     });
 
-    const defaultRouteLambda = new Function(this, "DefaultRouteLambda", {
+    const webSocketDefaultRouteLambda = new Function(this, "WebSocketDefaultRouteLambda", {
       runtime: Runtime.NODEJS_18_X,
-      code: Code.fromAsset(path.join(__dirname, "../../src/util/websocket/route")),
+      code: Code.fromAsset(path.join(__dirname, webSocketRouteFunctionsLocation)),
       handler: "default.handler"
     });
 
     // To perform authorization of a websocket connection 
     const webSocketLambdaAuthorizer = new NodejsFunction(this, "WebSocketLambdaAuthorizer", {
       runtime: Runtime.NODEJS_18_X,
-      entry: (path.join(__dirname, "../../src/util/websocket/auth.js")),
+      entry: (path.join(__dirname, webSocketLambdaAuthorizerHandlerLocation)),
       handler: "handler",
-      depsLockFilePath: (path.join(__dirname, "../../../../package-lock.json")),
+      depsLockFilePath: (path.join(__dirname, packageLockJsonLocation)),
       environment: {
-        cognitoUserPoolId: props.cognitoUserPoolId,
-        cognitoUserPoolClientId: props.cognitoUserPoolClientId,
+        userPoolId: cognitoStack.userPool.userPoolId,
+        userPoolClientId: cognitoStack.userPoolClient.userPoolClientId
       }
     });
 
@@ -79,7 +100,7 @@ class WebSocketStack extends Stack {
       connectRouteOptions: {
         integration: new WebSocketLambdaIntegration(
           "ConnectRouteWebsocketLambdaIntegration",
-          connectRouteLambda
+          webSocketConnectRouteLambda
         ),
         authorizer: new WebSocketLambdaAuthorizer(
           "WebSocketLambdaAuthorizer",
@@ -91,14 +112,14 @@ class WebSocketStack extends Stack {
       disconnectRouteOptions: {
         integration: new WebSocketLambdaIntegration(
           "DisconnectRouteWebsocketLambdaIntegration",
-          disconnectRouteLambda
+          webSocketDisconnectRouteLambda
         )
       },
 
       defaultRouteOptions: {
         integration: new WebSocketLambdaIntegration(
           "DefaultRouteWebsocketLambdaIntegration",
-          defaultRouteLambda
+          webSocketDefaultRouteLambda
         )
       },
     });
@@ -107,9 +128,9 @@ class WebSocketStack extends Stack {
     /*** Custom Route Handling Lambdas ***/
 
     // To receive messages from the web client
-    const fromWebClientRouteLambda = new Function(this, "FromWebClientRouteLambda", {
+    const webSocketFromWebClientRouteLambda = new Function(this, "WebSocketFromWebClientRouteLambda", {
       runtime: Runtime.NODEJS_18_X,
-      code: Code.fromAsset(path.join(__dirname, "../../src/util/websocket/route")),
+      code: Code.fromAsset(path.join(__dirname, webSocketRouteFunctionsLocation)),
       handler: "from-web-client.handler",
       initialPolicy: [
         // Allow this lambda to publish to all SNS topics
@@ -129,12 +150,13 @@ class WebSocketStack extends Stack {
     });
 
     // To send messages to the web client
-    const toWebClientRouteLambda = new Function(this, "ToWebClientRouteLambda", {
+    const webSocketToWebClientRouteLambda = new Function(this, "WebSocketToWebClientRouteLambda", {
       runtime: Runtime.NODEJS_18_X,
-      code: Code.fromAsset(path.join(__dirname, "../../src/util/websocket/route")),
+      code: Code.fromAsset(path.join(__dirname, webSocketRouteFunctionsLocation)),
       handler: "to-web-client.handler",
       environment: {
-        webSocketConnectionsTableName: webSocketConnectionsTable.tableName,
+        // webSocketConnectionsTableName: webSocketConnectionsTable.tableName,
+        webSocketConnectionsTableName: dataStack.webSocketConnectionsTable.tableName,
         webSocketApiEndpoint: webSocketApi.apiEndpoint
       }
     });
@@ -145,14 +167,14 @@ class WebSocketStack extends Stack {
     webSocketApi.addRoute("fromwebclient", {
       integration: new WebSocketLambdaIntegration(
         "FromWebClientRouteWebsocketLambdaIntegration",
-        fromWebClientRouteLambda
+        webSocketFromWebClientRouteLambda
       )
     });
 
     webSocketApi.addRoute("towebclient", {
       integration: new WebSocketLambdaIntegration(
         "ToWebClientRouteWebsocketLambdaIntegration",
-        toWebClientRouteLambda
+        webSocketToWebClientRouteLambda
       )
     });
 
@@ -166,32 +188,32 @@ class WebSocketStack extends Stack {
     });
 
 
-    /*** SQS ***/
+    /*** Topic ***/
 
-    // const toWebClientRouteQueue = new Queue(this, "ToWebClientRouteQueue");
+    // const toWebClientRouteTopic = new Topic(this, "ToWebClientRouteTopic",
+    //   {
+    //     displayName: "To send messages to web client topic",
+    //     topicName: "ToWebClientRouteTopic"
+    //   });
 
 
-    /*** Patterns ***/
+    /*** Subscriptions */
 
-    // const toWebClientRouteSqsToLambdaPattern = new SqsToLambda(this, "ToWebClientRouteSqsToLambdaPattern", {
-    //   existingLambdaObj: toWebClientRouteHandlerLambda,
-    //   existingQueueObj: toWebClientRouteQueue
-    // });
+    this.webSocketToWebClientRouteQueue = new Queue(this, "WebSocketToWebClientRouteQueue");
+
+    new SqsToLambda(this, "WebSocketToWebClientRouteSqsToLambda", {
+      existingQueueObj: this.webSocketToWebClientRouteQueue,
+      existingLambdaObj: webSocketToWebClientRouteLambda
+    });
 
 
     /*** Permissions ***/
 
-    webSocketConnectionsTable.grantReadWriteData(connectRouteLambda);
-    webSocketConnectionsTable.grantReadWriteData(disconnectRouteLambda);
-    webSocketConnectionsTable.grantReadWriteData(toWebClientRouteLambda);
+    dataStack.webSocketConnectionsTable.grantReadWriteData(webSocketConnectRouteLambda);
+    dataStack.webSocketConnectionsTable.grantReadWriteData(webSocketDisconnectRouteLambda);
+    dataStack.webSocketConnectionsTable.grantReadWriteData(webSocketToWebClientRouteLambda);
 
-    // fromClientRouteWebsocketLambda.addToRolePolicy(new PolicyStatement({
-    //   effect: Effect.ALLOW,
-    //   resources: ["arn:aws:sns:us-east-1:346761569124:topic:*"],
-    //   actions: ["topic:Publish"]
-    // }));
-
-    toWebClientRouteLambda.addToRolePolicy(new PolicyStatement({
+    webSocketToWebClientRouteLambda.addToRolePolicy(new PolicyStatement({
       effect: Effect.ALLOW,
       resources: ["arn:aws:execute-api:us-east-1:346761569124:m71oz07fyl/dev/POST/@connections"],
       actions: ["execute-api:Invoke"]

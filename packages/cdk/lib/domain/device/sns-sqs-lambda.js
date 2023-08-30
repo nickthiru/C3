@@ -13,9 +13,9 @@ class SnsToSqsToLambdaStack extends Stack {
     // Provision Single Device Command
     new SnsToSqsToLambdaPattern(this, "ProvisionSingleDeviceSnsToSqsToLambdaPattern", {
       command: "ProvisionSingleDevice",
-      topicObj: topic.provisionSingleDeviceRequestedTopic,
-      queueObj: queue.provisionSingleDeviceQueue,
-      lambdaObj: lambda.provisionSingleDeviceLambda
+      topicObj: topic.provisionDeviceRequestedTopic,
+      queueObj: queue.provisionDeviceWorkflowQueue,
+      lambdaObj: lambda.provisionDeviceWorkflowLambda
     });
 
     // Provision Batch Devices Command

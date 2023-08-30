@@ -9,8 +9,9 @@ This is not related to this particular handler, but remember to register an "eve
 const client = new SNSClient();
 
 exports.handler = async (event, context, callback) => {
-  console.log("Inside 'provision single device' handler");
+  console.log("Inside 'provision device' handler");
   console.log("event: " + JSON.stringify(event));
+  console.log("process.env.outputEvents: " + process.env.outputEvents);
 
   /*** Input Gate ***/
 
@@ -43,15 +44,15 @@ exports.handler = async (event, context, callback) => {
 
   /*** Publish 'completed' event ***/
 
-  // try {
-  //   var response = await client.send(new PublishCommand({
-  //     TopicArn: process.env.topicArn,
-  //     Message: "ProvisionSingleDeviceCommand completed!",
-  //   }));
-  //   console.log("response: " + JSON.stringify(response));
-  // } catch (err) {
-  //   console.log(err);
-  // }
+  try {
+    var response = await client.send(new PublishCommand({
+      TopicArn: process.env.outputEvents,
+      Message: "ProvisionSingleDeviceCommand completed!",
+    }));
+    console.log("response: " + JSON.stringify(response));
+  } catch (err) {
+    console.log(err);
+  }
 
   const response = {
     statusCode: 200
