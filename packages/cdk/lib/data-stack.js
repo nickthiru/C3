@@ -1,4 +1,4 @@
-const { Stack, CfnOutput, RemovalPolicy } = require("aws-cdk-lib");
+const { Stack, RemovalPolicy } = require("aws-cdk-lib");
 const { Table, AttributeType, BillingMode } = require("aws-cdk-lib/aws-dynamodb");
 
 
@@ -16,11 +16,6 @@ class DataStack extends Stack {
       removalPolicy: RemovalPolicy.DESTROY,
       billingMode: BillingMode.PAY_PER_REQUEST
     });
-
-    // new CfnOutput(this, "WebSocketConnectionsTableName", {
-    //   value: this.webSocketConnectionsTable.tableName,
-    //   exportName: "WebSocketConnectionsTableName"
-    // })
   }
 }
 

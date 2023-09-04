@@ -2,6 +2,7 @@ const { Stack } = require("aws-cdk-lib");
 const { Topic } = require("aws-cdk-lib/aws-sns");
 const { Queue } = require("aws-cdk-lib/aws-sqs");
 const { Function, Runtime, Code } = require("aws-cdk-lib/aws-lambda");
+const { PolicyStatement, Effect } = require("aws-cdk-lib/aws-iam");
 const { SnsToSqsToLambdaPattern } = require("../../construct/sns-sqs-lambda.js");
 const path = require("path");
 
@@ -10,29 +11,35 @@ const path = require("path");
 // const { QueueStack } = require("./queue.js");
 // const { SnsToSqsToLambdaStack } = require("./sns-sqs-lambda.js");
 
+const domain = {
+  topics: [
+    "ProvisionDeviceRequestedTopic",
+    "ProvisionDeviceWorkflowCompletedTopic"
+  ],
+  workflows: [
+    "ProvisionDeviceWorkflow"
+  ]
+}
+
 class DeviceManagementStack extends Stack {
   constructor(scope, id, props) {
     super(scope, id, props);
+
 
     /*** Events ***/
 
     // const topic = new TopicStack(this, "TopicStack");
 
+    const provisionDeviceRequestedTopic = new Topic(this, "ProvisionDeviceRequestedTopic", {
+      topicName: "ProvisionDeviceRequestedTopic"
+    });
 
-    const provisionDeviceRequestedTopic = new Topic(this, "ProvisionDeviceRequestedTopic",
-      {
-        displayName: "Provision device(s) requested topic",
-        topicName: "ProvisionDeviceRequestedTopic"
-      });
-
-    this.provisionDeviceWorkflowCompletedTopic = new Topic(this, "ProvisionDeviceWorkflowCompletedTopic",
-      {
-        displayName: "Provision device(s) workflow completed topic",
-        topicName: "ProvisionDeviceWorkflowCompletedTopic"
-      });
+    this.provisionDeviceWorkflowCompletedTopic = new Topic(this, "ProvisionDeviceWorkflowCompletedTopic", {
+      topicName: "ProvisionDeviceWorkflowCompletedTopic"
+    });
 
 
-    /*** Subscriptions ***/
+    /*** Workflows ***/
 
     // const queue = new QueueStack(this, "QueueStack");
 
@@ -50,6 +57,11 @@ class DeviceManagementStack extends Stack {
         outputEvents: this.provisionDeviceWorkflowCompletedTopic.topicArn
       }
     });
+    provisionDeviceWorkflowLambda.addToRolePolicy(new PolicyStatement({
+      effect: Effect.ALLOW,
+      resources: [`arn:aws:sns:us-east-1:346761569124:${provisionDeviceRequestedTopic.topicName}`],
+      actions: ["sns:Publish"]
+    }))
 
     new SnsToSqsToLambdaPattern(this, "ProvisionDeviceWorkflowSnsToSqsToLambdaPattern", {
       command: "ProvisionDeviceWorkflow",

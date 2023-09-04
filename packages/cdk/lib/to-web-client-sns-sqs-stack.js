@@ -2,17 +2,19 @@ const { Stack } = require('aws-cdk-lib');
 const { SnsToSqs } = require("@aws-solutions-constructs/aws-sns-sqs");
 
 
-class ToWebClientSubscriptionsStack extends Stack {
+class ToWebClientSnsToSqsStack extends Stack {
   constructor(scope, id, props) {
     super(scope, id, props);
 
-    const { deviceMgmtStack, webSocketStack } = props;
+    const { webSocketStack, deviceMgmtStack } = props;
+
+    const queue = webSocketStack.webSocketToWebClientRouteQueue;
 
     new SnsToSqs(this, "provisionDeviceWorkflowCompletedSnsToSqs", {
       existingTopicObj: deviceMgmtStack.provisionDeviceWorkflowCompletedTopic,
-      existingQueueObj: webSocketStack.webSocketToWebClientRouteQueue
+      existingQueueObj: queue
     });
   }
 }
 
-module.exports = { ToWebClientSubscriptionsStack };
+module.exports = { ToWebClientSnsToSqsStack };

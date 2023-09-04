@@ -1,17 +1,13 @@
-const { Stack, CfnOutput, RemovalPolicy } = require("aws-cdk-lib");
+const { Stack, CfnOutput } = require("aws-cdk-lib");
 const { NodejsFunction } = require("aws-cdk-lib/aws-lambda-nodejs");
 const { Function, Code, Runtime } = require("aws-cdk-lib/aws-lambda");
 const { WebSocketApi, WebSocketStage } = require("@aws-cdk/aws-apigatewayv2-alpha");
 const { WebSocketLambdaIntegration } = require("@aws-cdk/aws-apigatewayv2-integrations-alpha");
 const { WebSocketLambdaAuthorizer } = require("@aws-cdk/aws-apigatewayv2-authorizers-alpha");
-// const { Table, AttributeType, BillingMode } = require("aws-cdk-lib/aws-dynamodb");
 const { PolicyStatement, Effect } = require("aws-cdk-lib/aws-iam");
-const path = require("path");
-
-// const { Topic } = require("aws-cdk-lib/aws-sns");
 const { Queue } = require("aws-cdk-lib/aws-sqs");
 const { SqsToLambda } = require("@aws-solutions-constructs/aws-sqs-lambda");
-// const { SnsToSqsToLambdaPattern } = require("../../construct/sns-sqs-lambda.js");
+const path = require("path");
 
 
 class WebSocketStack extends Stack {
@@ -20,29 +16,9 @@ class WebSocketStack extends Stack {
 
     const { cognitoStack, dataStack } = props;
 
-    // const userPoolId = cognitoStack.userPool.userPoolId;
-    // const userPoolClientId = cognitoStack.userPoolClient.userPoolClientId;
-
-    // const webSocketConnectionsTableName = dataStack.webSocketConnectionsTable.tableName;
-
-
     const webSocketRouteFunctionsLocation = "../src/api/websocket/route";
     const webSocketLambdaAuthorizerHandlerLocation = "../src/api/websocket/lambda-authorizer.js";
     const packageLockJsonLocation = "../../../package-lock.json";
-
-
-    /*** Data Storage ***/
-
-    // DDB table to store WebSocket connections. This table needs to be set/accessed
-    // in the 'ConnectRoute_WebsocketLambda' (line 20).
-    // const webSocketConnectionsTable = new Table(this, "WebSocketConnectionsTable", {
-    //   partitionKey: {
-    //     name: "connectionId",
-    //     type: AttributeType.STRING
-    //   },
-    //   removalPolicy: RemovalPolicy.DESTROY,
-    //   billingMode: BillingMode.PAY_PER_REQUEST
-    // });
 
 
     /*** Built-In Route Handling Lambdas ***/
@@ -52,7 +28,6 @@ class WebSocketStack extends Stack {
       code: Code.fromAsset(path.join(__dirname, webSocketRouteFunctionsLocation)),
       handler: "connect.handler",
       environment: {
-        // webSocketConnectionsTableName: webSocketConnectionsTable.tableName
         webSocketConnectionsTableName: dataStack.webSocketConnectionsTable.tableName
       }
     });
@@ -62,7 +37,6 @@ class WebSocketStack extends Stack {
       code: Code.fromAsset(path.join(__dirname, webSocketRouteFunctionsLocation)),
       handler: "disconnect.handler",
       environment: {
-        // webSocketConnectionsTableName: webSocketConnectionsTable.tableName
         webSocketConnectionsTableName: dataStack.webSocketConnectionsTable.tableName
       }
     });
@@ -73,7 +47,7 @@ class WebSocketStack extends Stack {
       handler: "default.handler"
     });
 
-    // To perform authorization of a websocket connection 
+    // Authorizer for 'connect' route
     const webSocketLambdaAuthorizer = new NodejsFunction(this, "WebSocketLambdaAuthorizer", {
       runtime: Runtime.NODEJS_18_X,
       entry: (path.join(__dirname, webSocketLambdaAuthorizerHandlerLocation)),
@@ -81,7 +55,7 @@ class WebSocketStack extends Stack {
       depsLockFilePath: (path.join(__dirname, packageLockJsonLocation)),
       environment: {
         userPoolId: cognitoStack.userPool.userPoolId,
-        userPoolClientId: cognitoStack.userPoolClient.userPoolClientId
+        userPoolClientId: cognitoStack.userPoolClient.userPoolClientId,
       }
     });
 
@@ -125,6 +99,15 @@ class WebSocketStack extends Stack {
     });
 
 
+    /*** WebSocket Stages ***/
+
+    const devWebSocketStage = new WebSocketStage(this, "DevWebSocketStage", {
+      webSocketApi: webSocketApi,
+      stageName: "dev",
+      autoDeploy: true,
+    });
+
+
     /*** Custom Route Handling Lambdas ***/
 
     // To receive messages from the web client
@@ -133,14 +116,13 @@ class WebSocketStack extends Stack {
       code: Code.fromAsset(path.join(__dirname, webSocketRouteFunctionsLocation)),
       handler: "from-web-client.handler",
       initialPolicy: [
-        // Allow this lambda to publish to all SNS topics
+        // Authorize lambda to publish to all SNS topics
         new PolicyStatement({
           effect: Effect.ALLOW,
-          // resources: ["arn:aws:sns:us-east-1:346761569124:topic:*"],
           resources: ["arn:aws:sns:us-east-1:346761569124:*"],
           actions: ["sns:Publish"]
         }),
-        // Allow cognito users, with temp STS token, to publish to SNS
+        // Authorize cognito users, with temp STS token, to publish to SNS
         new PolicyStatement({
           effect: Effect.ALLOW,
           resources: ["arn:aws:sts::346761569124:assumed-role/*"],
@@ -154,10 +136,17 @@ class WebSocketStack extends Stack {
       runtime: Runtime.NODEJS_18_X,
       code: Code.fromAsset(path.join(__dirname, webSocketRouteFunctionsLocation)),
       handler: "to-web-client.handler",
+      initialPolicy: [
+        // Authorize lambda to 'post-to-connection'
+        new PolicyStatement({
+          effect: Effect.ALLOW,
+          resources: [`arn:aws:execute-api:us-east-1:346761569124:${webSocketApi.apiId}/${devWebSocketStage.stageName}/POST/@connections/*`],
+          actions: ["execute-api:Invoke", "execute-api:ManageConnections"]
+        }),
+      ],
       environment: {
-        // webSocketConnectionsTableName: webSocketConnectionsTable.tableName,
         webSocketConnectionsTableName: dataStack.webSocketConnectionsTable.tableName,
-        webSocketApiEndpoint: webSocketApi.apiEndpoint
+        webSocketApiConnectionUrl: `https://${webSocketApi.apiId}.execute-api.us-east-1.amazonaws.com/${devWebSocketStage.stageName}`
       }
     });
 
@@ -179,24 +168,6 @@ class WebSocketStack extends Stack {
     });
 
 
-    /*** WebSocket Stages ***/
-
-    const devWebSocketStage = new WebSocketStage(this, "DevWebSocketStage", {
-      webSocketApi,
-      stageName: "dev",
-      autoDeploy: true,
-    });
-
-
-    /*** Topic ***/
-
-    // const toWebClientRouteTopic = new Topic(this, "ToWebClientRouteTopic",
-    //   {
-    //     displayName: "To send messages to web client topic",
-    //     topicName: "ToWebClientRouteTopic"
-    //   });
-
-
     /*** Subscriptions */
 
     this.webSocketToWebClientRouteQueue = new Queue(this, "WebSocketToWebClientRouteQueue");
@@ -213,17 +184,10 @@ class WebSocketStack extends Stack {
     dataStack.webSocketConnectionsTable.grantReadWriteData(webSocketDisconnectRouteLambda);
     dataStack.webSocketConnectionsTable.grantReadWriteData(webSocketToWebClientRouteLambda);
 
-    webSocketToWebClientRouteLambda.addToRolePolicy(new PolicyStatement({
-      effect: Effect.ALLOW,
-      resources: ["arn:aws:execute-api:us-east-1:346761569124:m71oz07fyl/dev/POST/@connections"],
-      actions: ["execute-api:Invoke"]
-    }));
-
 
     /*** Stack Outputs ***/
 
     // For web client
-
     new CfnOutput(this, "DevStageWebSocketApiEndpoint", {
       value: `${webSocketApi.apiEndpoint}/${devWebSocketStage.stageName}`,
       description: "'dev' stage websocket API endpoint to be used by web client",

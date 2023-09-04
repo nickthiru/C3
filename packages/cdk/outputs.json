@@ -13,6 +13,6 @@
     "ExportsOutputRefProvisionDeviceWorkflowCompletedTopicC52E76F961F1F63E": "arn:aws:sns:us-east-1:346761569124:ProvisionDeviceWorkflowCompletedTopic"
   },
   "WebSocketStack": {
-    "DevStageWebSocketApiEndpoint": "wss://691728n0vb.execute-api.us-east-1.amazonaws.com/dev"
+    "DevStageWebSocketApiEndpoint": "wss://p109za3r0b.execute-api.us-east-1.amazonaws.com/dev"
   }
 }

@@ -54,9 +54,9 @@ exports.handler = async (event, context, callback) => {
     console.log(err);
   }
 
-  const response = {
-    statusCode: 200
-  };
+  // const response = {
+  //   statusCode: 200
+  // };
 
   callback(null, response);
 };

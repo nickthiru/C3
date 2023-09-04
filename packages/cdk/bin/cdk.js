@@ -5,17 +5,13 @@ const { CognitoStack } = require("../lib/cognito-stack.js");
 const { DataStack } = require('../lib/data-stack.js');
 const { WebSocketStack } = require("../lib/websocket-stack.js");
 const { DeviceManagementStack } = require("../lib/domain/device/device-mgmt-stack.js");
-
-const { ToWebClientSubscriptionsStack } = require("../lib/to-web-client-subscriptions-stack.js");
-
-// const { WebSocketBuiltInRoutesLambdaStack } = require('../lib/lambda/websocket-built-in-routes-lambda-stack.js');
-// const { WebSocketCustomRoutesLambdaStack } = require('../lib/lambda/websocket-custom-routes-lambda-stack.js');
-// const { WebSocketApiStack } = require('../lib/api/websocket/websocket-api-stack.js');
-// const { WebSocketCustomRoutesIntegrationStack } = require('../lib/api/websocket/websocket-custom-routes-integration-stack.js');
-// const { PolicyStatement, Effect } = require("aws-cdk-lib/aws-iam");
+const { ToWebClientSnsToSqsStack } = require("../lib/to-web-client-sns-sqs-stack.js");
 
 
 const app = new cdk.App();
+
+
+/*** Infra ***/
 
 const cognitoStack = new CognitoStack(app, "CognitoStack");
 
@@ -23,35 +19,26 @@ const dataStack = new DataStack(app, "DataStack");
 
 const webSocketStack = new WebSocketStack(app, "WebSocketStack", { cognitoStack, dataStack });
 
-// websocketStack.webSocketToWebClientRouteQueue
+
+/*** Domain ***/
 
 const deviceMgmtStack = new DeviceManagementStack(app, "DeviceManagementStack");
 
-
-/*** webSocketStack.webSocketToWebClientRouteQueue needs to subscribe to the following events (topics):  ***/
-
-// ProvisionDeviceWorkflowCompletedTopic
-new ToWebClientSubscriptionsStack(app, "ToWebClientSubscriptionsStack", { deviceMgmtStack, webSocketStack });
+// const mapStack = new MapStack(this, "MapStack", { deviceMgmt });
 
 
+/*** 
+ * webSocketStack.webSocketToWebClientRouteLambda's role is to pass messages to the web client.
+ * As such, any SNS topics that need to publish to the web client must publish to the
+ * webSocketStack.webSocketToWebClientRouteQueue. The following stack's resposiblity is to link
+ * all those topics to that queue.   
+ * ***/
 
-
-
-
-/*** WebSocket Resources ***/
-
-// const webSocketBuiltInRoutesLambdaStack = new WebSocketBuiltInRoutesLambdaStack(app, "WebSocketBuiltInRoutesLambdaStack", { cognitoStack, dataStack });
-
-// const webSocketApiStack = new WebSocketApiStack(app, "WebSocketApiStack", { webSocketBuiltInRoutesLambdaStack });
-
-// const webSocketCustomRoutesLambdaStack = new WebSocketCustomRoutesLambdaStack(app, "WebSocketCustomRoutesLambdaStack", { dataStack, webSocketApiStack });
-
-// new WebSocketCustomRoutesIntegrationStack(app, "WebSocketCustomRoutesIntegrationStack", { webSocketApiStack, webSocketCustomRoutesLambdaStack });
-
-
-
-// const map = new MapStack(this, "MapStack", { deviceMgmt });
-
+new ToWebClientSnsToSqsStack(app, "ToWebClientSnsToSqsStack", {
+  webSocketStack,
+  deviceMgmtStack,
+  // mapStack
+});
 
 
 

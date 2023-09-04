@@ -1,18 +1,18 @@
-const { Stack } = require("aws-cdk-lib");
-const { Topic, Subscription } = require("aws-cdk-lib/aws-sns");
-const { PolicyStatement, Effect } = require("aws-cdk-lib/aws-iam");
+const { Topic } = require("aws-cdk-lib/aws-sns");
+const { Construct } = require("constructs");
 
 /**
  * @description This factory pattern generates a list of SNS Topics from a list of Business Events
  */
-class TopicFactory extends Stack {
+class TopicFactory extends Construct {
   /**
    * @param {Construct} scope
    * @param {string} id
    * @param {StackProps=} props
    */
   constructor(scope, id, props) {
-    console.log("events: " + props);
+
+    const { topicName } = props;
 
     // Return list of business events as SNS Topics
     return props.businessEvents.map((event) => {

@@ -6,16 +6,23 @@ const { ApiGatewayManagementApiClient, PostToConnectionCommand } = require("@aws
 const { DynamoDBClient, ScanCommand } = require("@aws-sdk/client-dynamodb");
 const { unmarshall } = require("@aws-sdk/util-dynamodb");
 
+
 const apiGwMgmtApiClient = new ApiGatewayManagementApiClient({
-  endpoint: process.env.webSocketApiEndpoint
+  endpoint: process.env.webSocketApiConnectionUrl
 });
 
 const ddbClient = new DynamoDBClient();
 
+
 exports.handler = async (event, context, callback) => {
+  console.log("Inside 'to web client' handler");
+  console.log("event: " + JSON.stringify(event));
+
+  const body = JSON.parse(event["Records"][0]["body"]);
+
   try {
     const { Items } = await ddbClient.send(new ScanCommand({
-      TableName: process.env.webSocketConnectionsTable
+      TableName: process.env.webSocketConnectionsTableName
     }));
 
     Items.forEach(async (Item) => {
@@ -26,7 +33,7 @@ exports.handler = async (event, context, callback) => {
       try {
         const result = await apiGwMgmtApiClient.send(new PostToConnectionCommand({
           ConnectionId: unmarshalledItem["connectionId"],
-          Data: "Hello!"
+          Data: body["Message"]
         }));
         console.log("result: " + result);
       }
@@ -37,15 +44,6 @@ exports.handler = async (event, context, callback) => {
   } catch (err) {
     console.error(err);
   }
-
-  // try {
-  //   await apiGwMgmtApiClient.send(new PostToConnectionCommand({
-  //     ConnectionId: "I0n2VfxsoAMCJOw=",
-  //     Data: "Hello"
-  //   }));
-  // } catch (err) {
-  //   console.error(err);
-  // }
 
   const response = {
     statusCode: 200
