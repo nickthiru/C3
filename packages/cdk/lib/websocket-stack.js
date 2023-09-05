@@ -1,4 +1,5 @@
-const { Stack, CfnOutput } = require("aws-cdk-lib");
+const { Stack, CfnOutput, Fn } = require("aws-cdk-lib");
+const { Table } = require("aws-cdk-lib/aws-dynamodb");
 const { NodejsFunction } = require("aws-cdk-lib/aws-lambda-nodejs");
 const { Function, Code, Runtime } = require("aws-cdk-lib/aws-lambda");
 const { WebSocketApi, WebSocketStage } = require("@aws-cdk/aws-apigatewayv2-alpha");
@@ -14,34 +15,42 @@ class WebSocketStack extends Stack {
   constructor(scope, id, props) {
     super(scope, id, props);
 
-    const { cognitoStack, dataStack } = props;
-
     const webSocketRouteFunctionsLocation = "../src/api/websocket/route";
     const webSocketLambdaAuthorizerHandlerLocation = "../src/api/websocket/lambda-authorizer.js";
     const packageLockJsonLocation = "../../../package-lock.json";
+
+    // From CognitoStack
+    const userPoolId = Fn.importValue("UserPoolId");
+    const userPoolClientId = Fn.importValue("UserPoolClientId");
+
+    // From DataStack
+    const webSocketConnectionsTable = Table.fromTableArn(this, "WebSocketConnectionsTable", Fn.importValue("WebSocketConnectionsTableArn"));
 
 
     /*** Built-In Route Handling Lambdas ***/
 
     const webSocketConnectRouteLambda = new Function(this, "WebSocketConnectRouteLambda", {
+      functionName: "WebSocketConnectRouteLambda",
       runtime: Runtime.NODEJS_18_X,
       code: Code.fromAsset(path.join(__dirname, webSocketRouteFunctionsLocation)),
       handler: "connect.handler",
       environment: {
-        webSocketConnectionsTableName: dataStack.webSocketConnectionsTable.tableName
+        webSocketConnectionsTableName: webSocketConnectionsTable.tableName
       }
     });
 
     const webSocketDisconnectRouteLambda = new Function(this, "WebSocketDisconnectRouteLambda", {
+      functionName: "WebSocketDisconnectRouteLambda",
       runtime: Runtime.NODEJS_18_X,
       code: Code.fromAsset(path.join(__dirname, webSocketRouteFunctionsLocation)),
       handler: "disconnect.handler",
       environment: {
-        webSocketConnectionsTableName: dataStack.webSocketConnectionsTable.tableName
+        webSocketConnectionsTableName: webSocketConnectionsTable.tableName
       }
     });
 
     const webSocketDefaultRouteLambda = new Function(this, "WebSocketDefaultRouteLambda", {
+      functionName: "WebSocketDefaultRouteLambda",
       runtime: Runtime.NODEJS_18_X,
       code: Code.fromAsset(path.join(__dirname, webSocketRouteFunctionsLocation)),
       handler: "default.handler"
@@ -49,13 +58,14 @@ class WebSocketStack extends Stack {
 
     // Authorizer for 'connect' route
     const webSocketLambdaAuthorizer = new NodejsFunction(this, "WebSocketLambdaAuthorizer", {
+      functionName: "WebSocketLambdaAuthorizer",
       runtime: Runtime.NODEJS_18_X,
       entry: (path.join(__dirname, webSocketLambdaAuthorizerHandlerLocation)),
       handler: "handler",
       depsLockFilePath: (path.join(__dirname, packageLockJsonLocation)),
       environment: {
-        userPoolId: cognitoStack.userPool.userPoolId,
-        userPoolClientId: cognitoStack.userPoolClient.userPoolClientId,
+        userPoolId: userPoolId,
+        userPoolClientId: userPoolClientId,
       }
     });
 
@@ -63,6 +73,7 @@ class WebSocketStack extends Stack {
     /*** WebSocket API ***/
 
     const webSocketApi = new WebSocketApi(this, "WebSocketApi", {
+      apiName: "WebSocketApi",
 
       // The route selection expression value will name the Lambda Function that will
       // be invoked (see "WebSocket Custom Routes" section below).
@@ -102,8 +113,8 @@ class WebSocketStack extends Stack {
     /*** WebSocket Stages ***/
 
     const devWebSocketStage = new WebSocketStage(this, "DevWebSocketStage", {
-      webSocketApi: webSocketApi,
       stageName: "dev",
+      webSocketApi: webSocketApi,
       autoDeploy: true,
     });
 
@@ -112,6 +123,7 @@ class WebSocketStack extends Stack {
 
     // To receive messages from the web client
     const webSocketFromWebClientRouteLambda = new Function(this, "WebSocketFromWebClientRouteLambda", {
+      functionName: "WebSocketFromWebClientRouteLambda",
       runtime: Runtime.NODEJS_18_X,
       code: Code.fromAsset(path.join(__dirname, webSocketRouteFunctionsLocation)),
       handler: "from-web-client.handler",
@@ -133,6 +145,7 @@ class WebSocketStack extends Stack {
 
     // To send messages to the web client
     const webSocketToWebClientRouteLambda = new Function(this, "WebSocketToWebClientRouteLambda", {
+      functionName: "WebSocketToWebClientRouteLambda",
       runtime: Runtime.NODEJS_18_X,
       code: Code.fromAsset(path.join(__dirname, webSocketRouteFunctionsLocation)),
       handler: "to-web-client.handler",
@@ -145,7 +158,7 @@ class WebSocketStack extends Stack {
         }),
       ],
       environment: {
-        webSocketConnectionsTableName: dataStack.webSocketConnectionsTable.tableName,
+        webSocketConnectionsTableName: webSocketConnectionsTable.tableName,
         webSocketApiConnectionUrl: `https://${webSocketApi.apiId}.execute-api.us-east-1.amazonaws.com/${devWebSocketStage.stageName}`
       }
     });
@@ -170,28 +183,36 @@ class WebSocketStack extends Stack {
 
     /*** Subscriptions */
 
-    this.webSocketToWebClientRouteQueue = new Queue(this, "WebSocketToWebClientRouteQueue");
+    const webSocketToWebClientRouteQueue = new Queue(this, "WebSocketToWebClientRouteQueue", {
+      queueName: "WebSocketToWebClientRouteQueue"
+    });
 
     new SqsToLambda(this, "WebSocketToWebClientRouteSqsToLambda", {
-      existingQueueObj: this.webSocketToWebClientRouteQueue,
+      existingQueueObj: webSocketToWebClientRouteQueue,
       existingLambdaObj: webSocketToWebClientRouteLambda
     });
 
 
     /*** Permissions ***/
 
-    dataStack.webSocketConnectionsTable.grantReadWriteData(webSocketConnectRouteLambda);
-    dataStack.webSocketConnectionsTable.grantReadWriteData(webSocketDisconnectRouteLambda);
-    dataStack.webSocketConnectionsTable.grantReadWriteData(webSocketToWebClientRouteLambda);
+    webSocketConnectionsTable.grantReadWriteData(webSocketConnectRouteLambda);
+    webSocketConnectionsTable.grantReadWriteData(webSocketDisconnectRouteLambda);
+    webSocketConnectionsTable.grantReadWriteData(webSocketToWebClientRouteLambda);
 
 
-    /*** Stack Outputs ***/
+    /*** Outputs ***/
 
     // For web client
     new CfnOutput(this, "DevStageWebSocketApiEndpoint", {
       value: `${webSocketApi.apiEndpoint}/${devWebSocketStage.stageName}`,
       description: "'dev' stage websocket API endpoint to be used by web client",
       exportName: "DevStageWebSocketApiEndpoint"
+    });
+
+    new CfnOutput(this, "WebSocketToWebClientRouteQueueArn", {
+      value: `${webSocketToWebClientRouteQueue.queueArn}`,
+      description: "WebSocket's ToWebClientRoute's Queue ARN to send messages back to web client",
+      exportName: "WebSocketToWebClientRouteQueueArn"
     });
   }
 }

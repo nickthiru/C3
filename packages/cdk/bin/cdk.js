@@ -5,7 +5,7 @@ const { CognitoStack } = require("../lib/cognito-stack.js");
 const { DataStack } = require('../lib/data-stack.js');
 const { WebSocketStack } = require("../lib/websocket-stack.js");
 const { DeviceManagementStack } = require("../lib/domain/device/device-mgmt-stack.js");
-const { ToWebClientSnsToSqsStack } = require("../lib/to-web-client-sns-sqs-stack.js");
+// const { ToWebClientSnsToSqsStack } = require("../lib/to-web-client-sns-sqs-stack.js");
 
 
 const app = new cdk.App();
@@ -13,32 +13,32 @@ const app = new cdk.App();
 
 /*** Infra ***/
 
-const cognitoStack = new CognitoStack(app, "CognitoStack");
+new CognitoStack(app, "CognitoStack");
 
-const dataStack = new DataStack(app, "DataStack");
+new DataStack(app, "DataStack");
 
-const webSocketStack = new WebSocketStack(app, "WebSocketStack", { cognitoStack, dataStack });
+new WebSocketStack(app, "WebSocketStack");
 
 
 /*** Domain ***/
 
-const deviceMgmtStack = new DeviceManagementStack(app, "DeviceManagementStack");
+new DeviceManagementStack(app, "DeviceManagementStack");
 
-// const mapStack = new MapStack(this, "MapStack", { deviceMgmt });
+// new MapStack(app, "MapStack");
 
 
-/*** 
+/***
  * webSocketStack.webSocketToWebClientRouteLambda's role is to pass messages to the web client.
  * As such, any SNS topics that need to publish to the web client must publish to the
  * webSocketStack.webSocketToWebClientRouteQueue. The following stack's resposiblity is to link
- * all those topics to that queue.   
+ * all those topics to that queue.
  * ***/
 
-new ToWebClientSnsToSqsStack(app, "ToWebClientSnsToSqsStack", {
-  webSocketStack,
-  deviceMgmtStack,
-  // mapStack
-});
+// new ToWebClientSnsToSqsStack(app, "ToWebClientSnsToSqsStack", {
+//   webSocketStack,
+//   deviceMgmtStack,
+//   // mapStack
+// });
 
 
 
