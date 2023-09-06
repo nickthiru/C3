@@ -7,7 +7,6 @@ class CognitoStack extends Stack {
     super(scope, id, props);
 
     this.userPool = new UserPool(this, "UserPool", {
-      // userPoolName: "UserPool",
       selfSignUpEnabled: false,
       signInAliases: {
         username: true,
@@ -16,7 +15,6 @@ class CognitoStack extends Stack {
     });
 
     this.userPoolClient = this.userPool.addClient("UserPoolClient", {
-      // userPoolClientName: "UserPoolClient",
       authFlows: {
         adminUserPassword: true,
         custom: true,

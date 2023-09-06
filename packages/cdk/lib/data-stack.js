@@ -17,13 +17,6 @@ class DataStack extends Stack {
       removalPolicy: RemovalPolicy.DESTROY,
       billingMode: BillingMode.PAY_PER_REQUEST
     });
-
-    // For WebSocket Api
-    // new CfnOutput(this, "WebSocketConnectionsTableArn", {
-    //   value: webSocketConnectionsTable.tableArn,
-    //   description: "Table (ARN) to store WebSocket connection IDs",
-    //   exportName: "WebSocketConnectionsTableArn"
-    // });
   }
 }
 

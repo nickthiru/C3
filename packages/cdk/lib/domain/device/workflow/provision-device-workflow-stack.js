@@ -68,9 +68,7 @@ class ProvisionDeviceWorkflowStack extends Stack {
       topicName: `${outputEvent}Topic`
     });
 
-    const workflowQueue = new Queue(this, `${workflow}Queue`, {
-      queueName: `${workflow}Queue`
-    });
+    const workflowQueue = new Queue(this, `${workflow}Queue`);
 
     const workflowLambda = new NodejsFunction(this, `${workflow}Lambda`, {
       runtime: Runtime.NODEJS_18_X,
@@ -133,11 +131,12 @@ class ProvisionDeviceWorkflowStack extends Stack {
       exportName: `${triggerEvent}TopicArn`
     });
 
-    new CfnOutput(this, `${outputEvent}TopicArn`, {
-      value: `${outputEventTopic.topicArn}`,
-      description: `${outputEventDescription}`,
-      exportName: `${outputEvent}TopicArn`
-    });
+    // The workflow output event may not be necessary for the web client.
+    // new CfnOutput(this, `${outputEvent}TopicArn`, {
+    //   value: `${outputEventTopic.topicArn}`,
+    //   description: `${outputEventDescription}`,
+    //   exportName: `${outputEvent}TopicArn`
+    // });
   }
 }
 

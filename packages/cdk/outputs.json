@@ -1,20 +1,19 @@
 {
   "CognitoStack": {
-    "UserPoolClientId": "6pjqucou3q4paokkp5l0v71ong",
-    "UserPoolId": "us-east-1_zsgnT1Ydz",
-    "ExportsOutputRefUserPool6BA7E5F296FD7236": "us-east-1_zsgnT1Ydz",
-    "ExportsOutputRefUserPoolUserPoolClient40176907044A36CF": "6pjqucou3q4paokkp5l0v71ong"
+    "UserPoolClientId": "2vovb5908h37aai8pt5fqlos8m",
+    "UserPoolId": "us-east-1_7eQ3CqfB7",
+    "ExportsOutputRefUserPool6BA7E5F296FD7236": "us-east-1_7eQ3CqfB7",
+    "ExportsOutputRefUserPoolUserPoolClient40176907044A36CF": "2vovb5908h37aai8pt5fqlos8m"
   },
   "DataStack": {
     "ExportsOutputRefWebSocketConnectionsTable7F0028CC88CF439E": "WebSocketConnectionsTable",
     "ExportsOutputFnGetAttWebSocketConnectionsTable7F0028CCArn489CA596": "arn:aws:dynamodb:us-east-1:346761569124:table/WebSocketConnectionsTable"
   },
-  "DeviceManagementStackProvisionDeviceWorkflowStack0F99ADA6": {
-    "ProvisionDeviceWorkflowCompletedTopicArn": "arn:aws:sns:us-east-1:346761569124:ProvisionDeviceWorkflowCompletedTopic",
+  "DeviceManagementStackProvisionDeviceWorkflowDomainWorkflowFactory09BEEEB6": {
     "ProvisionDeviceRequestedTopicArn": "arn:aws:sns:us-east-1:346761569124:ProvisionDeviceRequestedTopic",
     "ExportsOutputRefProvisionDeviceWorkflowCompletedTopicC52E76F961F1F63E": "arn:aws:sns:us-east-1:346761569124:ProvisionDeviceWorkflowCompletedTopic"
   },
   "WebSocketStack": {
-    "DevStageWebSocketApiEndpoint": "wss://qzl4a3tio0.execute-api.us-east-1.amazonaws.com/dev"
+    "DevStageWebSocketApiEndpoint": "wss://mluiqow2a2.execute-api.us-east-1.amazonaws.com/dev"
   }
 }

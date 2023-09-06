@@ -4,7 +4,6 @@ const { CognitoStack } = require("../lib/cognito-stack.js");
 const { DataStack } = require('../lib/data-stack.js');
 const { WebSocketStack } = require("../lib/websocket-stack.js");
 const { DeviceManagementStack } = require("../lib/domain/device/device-mgmt-stack.js");
-// const { WebClientTopicSubscriptionsStack } = require("../lib/web-client-topic-sub-stack.js");
 
 
 const app = new cdk.App();
@@ -12,52 +11,46 @@ const app = new cdk.App();
 
 /*** Infra ***/
 
-//
+// For user management
 const cognitoStack = new CognitoStack(app, "CognitoStack");
+// Exports for ...
 const userPoolId = cognitoStack.userPool.userPoolId;
 const userPoolClientId = cognitoStack.userPoolClient.userPoolClientId;
 
-//
+
+// For storage & database
 const dataStack = new DataStack(app, "DataStack");
-const webSocketConnectionsTableObj = dataStack.webSocketConnectionsTable;
+// Export for ...
+const webSocketConnectionsTable = dataStack.webSocketConnectionsTable;
 
-// //
-// const webSocketStack = new WebSocketStack(app, "WebSocketStack", {
-//   cognitoStack,
-//   dataStack
-// });
 
-//
+// To enable event-driven architecture
 const webSocketStack = new WebSocketStack(app, "WebSocketStack", {
   userPoolId,
   userPoolClientId,
-  webSocketConnectionsTableObj
+  webSocketConnectionsTable
 });
+// Export for ...
 const webSocketToWebClientRouteQueue = webSocketStack.webSocketToWebClientRouteQueue;
 
 
 /*** Domain ***/
 
-//
+// To provide device management features
 new DeviceManagementStack(app, "DeviceManagementStack", {
   webSocketToWebClientRouteQueue
 });
+
 
 //
 // new MapStack(app, "MapStack");
 
 
-/***
- * webSocketStack.webSocketToWebClientRouteLambda's role is to pass messages to the web client.
- * As such, any SNS topics that need to publish to the web client must publish to the
- * webSocketStack.webSocketToWebClientRouteQueue. The following stack's resposiblity is to link
- * all those topics to that queue.
- * ***/
 
-// new WebClientTopicSubscriptionsStack(app, "WebClientTopicSubscriptionsStack", {
-//   webSocketStack,
-//   deviceManagementStack
-// });
+
+
+
+
 
 
 

@@ -1,24 +1,30 @@
 const { Stack } = require("aws-cdk-lib");
-// const { DomainWorkflowFactory } = require("../../construct/domain-workflow-factory.js");
-const { ProvisionDeviceWorkflowStack } = require("./workflow/provision-device-workflow-stack.js");
+const { DomainWorkflowFactory } = require("../../construct/domain-workflow-factory.js");
 
 
-// Relative to the DomainWorkflowFactory
-const domainSourceFilesLocation = "../../../../src/domain/device"
+// Relative to the DomainWorkflowFactory class location
+const domainSourceFilesFolderLocation = "../../src/domain/device"
+const packageLockJsonFileLocation = "../../../../package-lock.json";
 
-const domainName = "DeviceManagement";
 
-const packageLockJsonFile = "../../../../../../package-lock.json";
-
-// const domainEventsAndWorkflows = [
-//   {
-//     workflowTriggerEvent: "ProvisionDeviceRequested",
-//     workflowTriggerEventDescription: "Request from end user to provision devices",
-//     workflowCommand: "ProvisionDeviceWorkflow",
-//     workflowOutputEvent: "ProvisionDeviceWorkflowCompleted",
-//     workflowOutputEventDescription: "Completed provisioning of devices",
-//   }
-// ]
+// External data
+const domainWorkflows = [
+  {
+    workflow: {
+      name: "ProvisionDeviceWorkflow",
+      description: ""
+    },
+    triggerEvent: {
+      name: "ProvisionDeviceRequested",
+      description: "Request from end user to provision devices",
+    },
+    outputEvent: {
+      name: "ProvisionDeviceWorkflowCompleted",
+      description: "Completed provisioning of devices",
+      mustSendToWebClient: true
+    }
+  }
+];
 
 
 class DeviceManagementStack extends Stack {
@@ -27,12 +33,32 @@ class DeviceManagementStack extends Stack {
 
     const { webSocketToWebClientRouteQueue } = props;
 
-    new ProvisionDeviceWorkflowStack(this, "ProvisionDeviceWorkflowStack", {
-      webSocketToWebClientRouteQueue,
-      domainSourceFilesLocation,
-      domainName,
-      packageLockJsonFile
+
+    domainWorkflows.forEach(domainWorkflow => {
+
+      const triggerEvent = domainWorkflow.triggerEvent.name;
+      const workflow = domainWorkflow.workflow.name;
+      const outputEvent = domainWorkflow.outputEvent.name;
+      const mustSendOutputEventToWebClient = domainWorkflow.outputEvent.mustSendToWebClient;
+
+      new DomainWorkflowFactory(this, `${workflow}DomainWorkflowFactory`, {
+        triggerEvent,
+        workflow,
+        outputEvent,
+        mustSendOutputEventToWebClient,
+        webSocketToWebClientRouteQueue,
+        domainSourceFilesFolderLocation,
+        packageLockJsonFileLocation
+      })
     });
+
+    // new DomainWorkflowFactory(this, "DomainWorkflowFactory", {
+    //   webSocketToWebClientRouteQueue,
+    //   domainSourceFilesLocation,
+    //   domainName,
+    //   packageLockJsonFile
+    // });
+
 
     // domainEventsAndWorkflows.forEach(element => {
     //   new DomainWorkflowFactory(this, `${workflowCommand}${domainName}DomainWorkflowFactory`, {
