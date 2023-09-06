@@ -1,5 +1,0 @@
-{
-  "DataStack": {
-    "WebSocketConnectionsTableArn": "arn:aws:dynamodb:us-east-1:346761569124:table/WebSocketConnectionsTable"
-  }
-}

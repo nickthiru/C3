@@ -6,7 +6,6 @@ const { Function, Runtime, Code } = require("aws-cdk-lib/aws-lambda");
 const { PolicyStatement, Effect } = require("aws-cdk-lib/aws-iam");
 const { SnsToSqs } = require("@aws-solutions-constructs/aws-sns-sqs");
 const { SqsToLambda } = require("@aws-solutions-constructs/aws-sqs-lambda");
-const { Key } = require("aws-cdk-lib/aws-kms");
 const { LogGroup } = require("aws-cdk-lib/aws-logs");
 const { LogGroupSubscription, LogFormat } = require("@wheatstalk/cdk-sns-log-group-subscription");
 const path = require("path");
@@ -23,18 +22,14 @@ class DomainWorkflowFactory extends Construct {
       workflowCommand,
       workflowOutputEvent,
       workflowOutputEventDescription,
-      shouldSendToWebClient
     } = props;
 
 
-    const webSocketToWebClientRouteQueue = Queue.fromQueueArn(this, "WebSocketToWebClientRouteQueue", Fn.importValue("WebSocketToWebClientRouteQueueArn"));
-
-
-    const workflowTriggerTopic = new Topic(this, `${workflowTriggerEvent}Topic`, {
+    const workflowTriggerEventTopic = new Topic(this, `${workflowTriggerEvent}Topic`, {
       topicName: `${workflowTriggerEvent}Topic`
     });
 
-    const workflowOutputTopic = new Topic(this, `${workflowOutputEvent}Topic`, {
+    const workflowOutputEventTopic = new Topic(this, `${workflowOutputEvent}Topic`, {
       topicName: `${workflowOutputEvent}Topic`
     });
 
@@ -48,39 +43,38 @@ class DomainWorkflowFactory extends Construct {
       code: Code.fromAsset(path.join(__dirname, domainSourceFilesLocation)),
       handler: `${workflowCommand}.handler`,
       environment: {
-        workflowOutputTopicArn: workflowOutputTopic.topicArn
+        workflowOutputEventTopicArn: workflowOutputEventTopic.topicArn
       },
       initialPolicy: [
         new PolicyStatement({
           effect: Effect.ALLOW,
-          resources: [`arn:aws:sns:us-east-1:346761569124:${workflowOutputTopic.topicName}`],
+          resources: [`arn:aws:sns:us-east-1:346761569124:${workflowOutputEventTopic.topicName}`],
           actions: ["sns:Publish"]
         })
       ]
-    })
+    });
 
-    workflowTriggerTopic.addSubscription(
+    workflowTriggerEventTopic.addSubscription(
       new LogGroupSubscription({
         logGroup: new LogGroup(this, `${workflowTriggerEvent}TopicLogGroup`, {
           logGroupName: `${workflowTriggerEvent}TopicLogGroup`
         }),
         logFormat: LogFormat.MESSAGE
       })
-    )
+    );
 
-    workflowOutputTopic.addSubscription(
+    workflowOutputEventTopic.addSubscription(
       new LogGroupSubscription({
         logGroup: new LogGroup(this, `${workflowOutputEvent}TopicLogGroup`, {
           logGroupName: `${workflowOutputEvent}TopicLogGroup`
         }),
         logFormat: LogFormat.MESSAGE
       })
-    )
+    );
 
     new SnsToSqs(this, `${workflowCommand}SnsToSqs`, {
-      existingTopicObj: workflowTriggerTopic,
+      existingTopicObj: workflowTriggerEventTopic,
       existingQueueObj: workflowCommandQueue,
-      encryptionKey: new Key(this, `${workflowCommand}SnsToSqsEncryptionKey`)
     });
 
     new SqsToLambda(this, `${workflowCommand}SqsToLambda`, {
@@ -88,25 +82,17 @@ class DomainWorkflowFactory extends Construct {
       existingLambdaObj: workflowCommandLambda
     });
 
-    if (shouldSendToWebClient) {
-      new SnsToSqs(this, `${workflowOutputEvent}SnsToSqs`, {
-        existingTopicObj: workflowOutputTopic,
-        existingQueueObj: webSocketToWebClientRouteQueue,
-        encryptionKey: new Key(this, `${workflowOutputEvent}SnsToSqsEncryptionKey`)
-      });
-    }
-
 
     /*** Outputs ***/
 
     new CfnOutput(this, `${workflowTriggerEvent}TopicArn`, {
-      value: `${workflowTriggerTopic.topicArn}`,
+      value: `${workflowTriggerEventTopic.topicArn}`,
       description: `${workflowTriggerEventDescription}`,
       exportName: `${workflowTriggerEvent}TopicArn`
     });
 
     new CfnOutput(this, `${workflowOutputEvent}TopicArn`, {
-      value: `${workflowOutputTopic.topicArn}`,
+      value: `${workflowOutputEventTopic.topicArn}`,
       description: `${workflowOutputEventDescription}`,
       exportName: `${workflowOutputEvent}TopicArn`
     });

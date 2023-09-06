@@ -1,11 +1,10 @@
 #!/usr/bin/env node
 const cdk = require('aws-cdk-lib');
-
 const { CognitoStack } = require("../lib/cognito-stack.js");
 const { DataStack } = require('../lib/data-stack.js');
 const { WebSocketStack } = require("../lib/websocket-stack.js");
 const { DeviceManagementStack } = require("../lib/domain/device/device-mgmt-stack.js");
-// const { ToWebClientSnsToSqsStack } = require("../lib/to-web-client-sns-sqs-stack.js");
+// const { WebClientTopicSubscriptionsStack } = require("../lib/web-client-topic-sub-stack.js");
 
 
 const app = new cdk.App();
@@ -13,17 +12,38 @@ const app = new cdk.App();
 
 /*** Infra ***/
 
-new CognitoStack(app, "CognitoStack");
+//
+const cognitoStack = new CognitoStack(app, "CognitoStack");
+const userPoolId = cognitoStack.userPool.userPoolId;
+const userPoolClientId = cognitoStack.userPoolClient.userPoolClientId;
 
-new DataStack(app, "DataStack");
+//
+const dataStack = new DataStack(app, "DataStack");
+const webSocketConnectionsTableObj = dataStack.webSocketConnectionsTable;
 
-new WebSocketStack(app, "WebSocketStack");
+// //
+// const webSocketStack = new WebSocketStack(app, "WebSocketStack", {
+//   cognitoStack,
+//   dataStack
+// });
+
+//
+const webSocketStack = new WebSocketStack(app, "WebSocketStack", {
+  userPoolId,
+  userPoolClientId,
+  webSocketConnectionsTableObj
+});
+const webSocketToWebClientRouteQueue = webSocketStack.webSocketToWebClientRouteQueue;
 
 
 /*** Domain ***/
 
-new DeviceManagementStack(app, "DeviceManagementStack");
+//
+new DeviceManagementStack(app, "DeviceManagementStack", {
+  webSocketToWebClientRouteQueue
+});
 
+//
 // new MapStack(app, "MapStack");
 
 
@@ -34,10 +54,9 @@ new DeviceManagementStack(app, "DeviceManagementStack");
  * all those topics to that queue.
  * ***/
 
-// new ToWebClientSnsToSqsStack(app, "ToWebClientSnsToSqsStack", {
+// new WebClientTopicSubscriptionsStack(app, "WebClientTopicSubscriptionsStack", {
 //   webSocketStack,
-//   deviceMgmtStack,
-//   // mapStack
+//   deviceManagementStack
 // });
 
 

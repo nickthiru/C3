@@ -1,6 +1,0 @@
-{
-  "DeviceManagementStack": {
-    "ProvisionDeviceWorkflowDeviceManagementDomainFactoryProvisionDeviceWorkflowCompletedTopicArn3C865683": "arn:aws:sns:us-east-1:346761569124:ProvisionDeviceWorkflowCompletedTopic",
-    "ProvisionDeviceWorkflowDeviceManagementDomainFactoryProvisionDeviceRequestedTopicArn54559211": "arn:aws:sns:us-east-1:346761569124:ProvisionDeviceRequestedTopic"
-  }
-}

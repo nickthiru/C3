@@ -11,7 +11,9 @@ const client = new SNSClient();
 exports.handler = async (event, context, callback) => {
   console.log("Inside 'provision device' handler");
   console.log("event: " + JSON.stringify(event));
-  console.log("process.env.workflowOutputTopicArn: " + process.env.workflowOutputTopicArn);
+  console.log("process.env.outputEventTopicName: " + process.env.outputEventTopicName);
+  console.log("process.env.outputEventTopicArn: " + process.env.outputEventTopicArn);
+
 
   /*** Input Gate ***/
 
@@ -46,8 +48,8 @@ exports.handler = async (event, context, callback) => {
 
   try {
     var response = await client.send(new PublishCommand({
-      TopicArn: process.env.workflowOutputTopicArn,
-      Message: "ProvisionDeviceWorkflow completed!",
+      TopicArn: process.env.outputEventTopicArn,
+      Message: `${process.env.outputEventTopicName}`,
     }));
     console.log("response: " + JSON.stringify(response));
   } catch (err) {

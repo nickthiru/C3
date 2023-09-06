@@ -8,7 +8,7 @@ class DataStack extends Stack {
 
     // DDB table to store WebSocket connections. This table needs to be set/accessed
     // in the 'ConnectRoute_WebsocketLambda' (line 20).
-    const webSocketConnectionsTable = new Table(this, "WebSocketConnectionsTable", {
+    this.webSocketConnectionsTable = new Table(this, "WebSocketConnectionsTable", {
       tableName: "WebSocketConnectionsTable",
       partitionKey: {
         name: "connectionId",
@@ -19,11 +19,11 @@ class DataStack extends Stack {
     });
 
     // For WebSocket Api
-    new CfnOutput(this, "WebSocketConnectionsTableArn", {
-      value: webSocketConnectionsTable.tableArn,
-      description: "Table (ARN) to store WebSocket connection IDs",
-      exportName: "WebSocketConnectionsTableArn"
-    });
+    // new CfnOutput(this, "WebSocketConnectionsTableArn", {
+    //   value: webSocketConnectionsTable.tableArn,
+    //   description: "Table (ARN) to store WebSocket connection IDs",
+    //   exportName: "WebSocketConnectionsTableArn"
+    // });
   }
 }
 

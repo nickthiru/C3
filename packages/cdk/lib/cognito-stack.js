@@ -6,8 +6,8 @@ class CognitoStack extends Stack {
   constructor(scope, id, props) {
     super(scope, id, props);
 
-    const userPool = new UserPool(this, "UserPool", {
-      userPoolName: "UserPool",
+    this.userPool = new UserPool(this, "UserPool", {
+      // userPoolName: "UserPool",
       selfSignUpEnabled: false,
       signInAliases: {
         username: true,
@@ -15,8 +15,8 @@ class CognitoStack extends Stack {
       }
     });
 
-    const userPoolClient = userPool.addClient("UserPoolClient", {
-      userPoolClientName: "UserPoolClient",
+    this.userPoolClient = this.userPool.addClient("UserPoolClient", {
+      // userPoolClientName: "UserPoolClient",
       authFlows: {
         adminUserPassword: true,
         custom: true,
@@ -27,7 +27,7 @@ class CognitoStack extends Stack {
 
     new CfnUserPoolGroup(this, "Admin", {
       groupName: "Admin",
-      userPoolId: userPool.userPoolId,
+      userPoolId: this.userPool.userPoolId,
     });
 
 
@@ -36,13 +36,13 @@ class CognitoStack extends Stack {
     // For web client Auth service
 
     new CfnOutput(this, "UserPoolId", {
-      value: userPool.userPoolId,
+      value: this.userPool.userPoolId,
       description: "Cognito user pool ID used by AWS Amplify in the web client's auth service",
       exportName: "UserPoolId"
     });
 
     new CfnOutput(this, "UserPoolClientId", {
-      value: userPoolClient.userPoolClientId,
+      value: this.userPoolClient.userPoolClientId,
       description: "Cognito user pool client ID used by AWS Amplify in the web client's auth service",
       exportName: "UserPoolClientId"
     });
