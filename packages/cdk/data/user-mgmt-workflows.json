@@ -1,0 +1,17 @@
+[
+  {
+    "workflow": {
+      "name": "AddUser",
+      "description": ""
+    },
+    "triggerEvent": {
+      "name": "AddUserRequested",
+      "description": "Request from admin end user to add a new user"
+    },
+    "outputEvent": {
+      "name": "AddUserCompleted",
+      "description": "Completed adding user",
+      "mustSendToWebClient": true
+    }
+  }
+]

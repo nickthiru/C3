@@ -1,4 +1,5 @@
-const { SNSClient, PublishCommand } = require("@aws-sdk/client-sns"); // CommonJS import
+// const { SNSClient, PublishCommand } = require("@aws-sdk/client-sns");
+const { publishToSns } = require("../../helper/publish-to-sns");
 
 /*
 Check the 'event' object for group-level authorization. https://www.udemy.com/course/aws-typescript-cdk-serverless-react/learn/lecture/27148474
@@ -6,14 +7,17 @@ Check the 'event' object for group-level authorization. https://www.udemy.com/co
 This is not related to this particular handler, but remember to register an "event" at the end of each task/function to SNS.
 */
 
-const client = new SNSClient();
+// const client = new SNSClient();
 
 exports.handler = async (event, context, callback) => {
   console.log("Inside 'provision device' handler");
   console.log("event: " + JSON.stringify(event));
+  console.log("context: " + JSON.stringify(context));
   console.log("process.env.outputEventTopicName: " + process.env.outputEventTopicName);
   console.log("process.env.outputEventTopicArn: " + process.env.outputEventTopicArn);
 
+  const outputEventTopicName = process.env.outputEventTopicName;
+  const outputEventTopicArn = process.env.outputEventTopicArn
 
   /*** Input Gate ***/
 
@@ -46,15 +50,17 @@ exports.handler = async (event, context, callback) => {
 
   /*** Publish 'completed' event ***/
 
-  try {
-    var response = await client.send(new PublishCommand({
-      TopicArn: process.env.outputEventTopicArn,
-      Message: `${process.env.outputEventTopicName}`,
-    }));
-    console.log("response: " + JSON.stringify(response));
-  } catch (err) {
-    console.log(err);
-  }
+  // try {
+  //   var response = await client.send(new PublishCommand({
+  //     TopicArn: process.env.outputEventTopicArn,
+  //     Message: `${process.env.outputEventTopicName}`,
+  //   }));
+  //   console.log("response: " + JSON.stringify(response));
+  // } catch (err) {
+  //   console.log(err);
+  // }
+
+  const response = publishToSns(outputEventTopicArn, outputEventTopicName);
 
   // const response = {
   //   statusCode: 200

@@ -51,42 +51,6 @@ class DeviceManagementStack extends Stack {
         packageLockJsonFileLocation
       })
     });
-
-    // new DomainWorkflowFactory(this, "DomainWorkflowFactory", {
-    //   webSocketToWebClientRouteQueue,
-    //   domainSourceFilesLocation,
-    //   domainName,
-    //   packageLockJsonFile
-    // });
-
-
-    // domainEventsAndWorkflows.forEach(element => {
-    //   new DomainWorkflowFactory(this, `${workflowCommand}${domainName}DomainWorkflowFactory`, {
-    //     domainSourceFilesLocation: domainSourceFilesLocation,
-    //     workflowTriggerEvent: element.workflowTriggerEvent,
-    //     workflowTriggerEventDescription: element.workflowTriggerEventDescription,
-    //     workflowCommand: element.workflowCommand,
-    //     workflowOutputEvent: element.workflowOutputEvent,
-    //     workflowOutputEventDescription: element.workflowOutputEventDescription,
-    //   })
-    // });
-
-    // domainEventsAndWorkflows.forEach((
-    //   workflowTriggerEvent,
-    //   workflowTriggerEventDescription,
-    //   workflowCommand,
-    //   workflowOutputEvent,
-    //   workflowOutputEventDescription
-    // ) => {
-    //   new DomainWorkflowFactory(this, `${workflowCommand}${domainName}DomainWorkflowFactory`, {
-    //     domainSourceFilesLocation: domainSourceFilesLocation,
-    //     workflowTriggerEvent,
-    //     workflowTriggerEventDescription,
-    //     workflowCommand,
-    //     workflowOutputEvent,
-    //     workflowOutputEventDescription
-    //   })
-    // });
   }
 }
 

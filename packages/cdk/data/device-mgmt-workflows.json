@@ -1,0 +1,17 @@
+[
+  {
+    "workflow": {
+      "name": "ProvisionDevice",
+      "description": ""
+    },
+    "triggerEvent": {
+      "name": "ProvisionDeviceRequested",
+      "description": "Request from end user to provision devices"
+    },
+    "outputEvent": {
+      "name": "ProvisionDeviceCompleted",
+      "description": "Completed provisioning of devices",
+      "mustSendToWebClient": true
+    }
+  }
+]

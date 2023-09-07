@@ -1,4 +1,5 @@
-const { Stack, CfnOutput } = require("aws-cdk-lib");
+const { Stack, CfnOutput, RemovalPolicy } = require("aws-cdk-lib");
+const { Table, AttributeType, BillingMode } = require("aws-cdk-lib/aws-dynamodb");
 const { NodejsFunction } = require("aws-cdk-lib/aws-lambda-nodejs");
 const { Runtime } = require("aws-cdk-lib/aws-lambda");
 const { WebSocketApi, WebSocketStage } = require("@aws-cdk/aws-apigatewayv2-alpha");
@@ -10,9 +11,9 @@ const { SqsToLambda } = require("@aws-solutions-constructs/aws-sqs-lambda");
 const path = require("path");
 
 
-const webSocketRouteFunctionsLocation = "../src/api/websocket/route";
-const webSocketLambdaAuthorizerHandler = "../src/api/websocket/lambda-authorizer.js";
-const packageLockJsonFile = "../../../package-lock.json";
+const webSocketRouteFunctionsLocation = "../../../src/api/websocket/route";
+const webSocketLambdaAuthorizerHandler = "../../../src/api/websocket/lambda-authorizer.js";
+const packageLockJsonFile = "../../../../../package-lock.json";
 
 
 class WebSocketStack extends Stack {
@@ -22,8 +23,22 @@ class WebSocketStack extends Stack {
     const {
       userPoolId,
       userPoolClientId,
-      webSocketConnectionsTable
+      // webSocketConnectionsTable
     } = props;
+
+    // const webSocketConnectionsTableName = webSocketConnectionsTable.tableName;
+
+    // DDB table to store WebSocket connections. This table needs to be set/accessed
+    // in the 'ConnectRoute_WebsocketLambda' (line 20).
+    const webSocketConnectionsTable = new Table(this, "WebSocketConnectionsTable", {
+      tableName: "WebSocketConnectionsTable",
+      partitionKey: {
+        name: "connectionId",
+        type: AttributeType.STRING
+      },
+      removalPolicy: RemovalPolicy.DESTROY,
+      billingMode: BillingMode.PAY_PER_REQUEST
+    });
 
     const webSocketConnectionsTableName = webSocketConnectionsTable.tableName;
 

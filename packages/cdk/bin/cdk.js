@@ -1,48 +1,44 @@
 #!/usr/bin/env node
 const cdk = require('aws-cdk-lib');
-const { CognitoStack } = require("../lib/cognito-stack.js");
-const { DataStack } = require('../lib/data-stack.js');
-const { WebSocketStack } = require("../lib/websocket-stack.js");
-const { DeviceManagementStack } = require("../lib/domain/device/device-mgmt-stack.js");
+const { UserManagementStack } = require('../lib/domain/user-mgmt/user-mgmt-stack.js');
+const { WebSocketStack } = require("../lib/api/websocket/websocket-stack.js");
+const { DeviceManagementStack } = require("../lib/domain/device-mgmt/device-mgmt-stack.js");
 
 
 const app = new cdk.App();
 
 
-/*** Infra ***/
+/*** User Management ***/
 
-// For user management
-const cognitoStack = new CognitoStack(app, "CognitoStack");
-// Exports for ...
-const userPoolId = cognitoStack.userPool.userPoolId;
-const userPoolClientId = cognitoStack.userPoolClient.userPoolClientId;
+const userMgmtStack = new UserManagementStack(app, "UserManagementStack");
 
-
-// For storage & database
-const dataStack = new DataStack(app, "DataStack");
-// Export for ...
-const webSocketConnectionsTable = dataStack.webSocketConnectionsTable;
+// Exports for WebSocketStack/WebSocketLambdaAuthorizer
+const userPoolId = userMgmtStack.cognitoStack.userPool.userPoolId;
+const userPoolClientId = userMgmtStack.cognitoStack.userPoolClient.userPoolClientId;
 
 
-// To enable event-driven architecture
+/*** WebSocket API ***/
+
 const webSocketStack = new WebSocketStack(app, "WebSocketStack", {
   userPoolId,
   userPoolClientId,
-  webSocketConnectionsTable
 });
-// Export for ...
+
+// Export for all events that need to be sent to the web client
 const webSocketToWebClientRouteQueue = webSocketStack.webSocketToWebClientRouteQueue;
+
+
+/*** HTTP API ***/
+
+
 
 
 /*** Domain ***/
 
-// To provide device management features
 new DeviceManagementStack(app, "DeviceManagementStack", {
   webSocketToWebClientRouteQueue
 });
 
-
-//
 // new MapStack(app, "MapStack");
 
 

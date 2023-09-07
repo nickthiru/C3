@@ -8,7 +8,7 @@ This is not related to this particular handler, but remember to register an "eve
 
 const client = new SNSClient();
 
-exports.handler = async (topicArn, message) => {
+exports.publishToSns = async (topicArn, message) => {
   console.log("Inside 'publish to sns' helper");
   console.log("topicArn: " + topicArn);
   console.log("message: " + message);
@@ -25,3 +25,12 @@ exports.handler = async (topicArn, message) => {
   }
 };
 
+  // try {
+  //   var response = await client.send(new PublishCommand({
+  //     TopicArn: process.env.outputEventTopicArn,
+  //     Message: `${process.env.outputEventTopicName}`,
+  //   }));
+  //   console.log("response: " + JSON.stringify(response));
+  // } catch (err) {
+  //   console.log(err);
+  // }

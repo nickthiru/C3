@@ -1,5 +1,5 @@
 import { Amplify, Auth } from "aws-amplify";
-import { CognitoStack } from "../../../cdk/outputs.json";
+import { UserManagementStackCognitoStackAF6E8786 as CognitoStack } from "../../../cdk/outputs.json";
 
 export default function AuthService() {
 
